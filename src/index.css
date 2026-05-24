@@ -1,0 +1,126 @@
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700;800;900&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Montserrat:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: 'Cormorant Garamond', Georgia, serif;
+  --font-display: 'Cinzel', 'Playfair Display', serif;
+  --font-mono: 'JetBrains Mono', monospace;
+
+  /* Royal & Classy gold brand color override mapping indigo */
+  --color-indigo-50: #faf6eb;   /* Pearl Alabaster / Champagne Cream */
+  --color-indigo-100: #f5eedc;  /* Soft Warm Champagne */
+  --color-indigo-200: #ead2a3;  /* Antique Gold Base */
+  --color-indigo-300: #dfbf85;  /* Noblesse Pale Gold */
+  --color-indigo-400: #cca561;  /* Brushed Gold Accent */
+  --color-indigo-500: #b98d45;  /* Royal Emblem Gold */
+  --color-indigo-600: #9e7534;  /* Classic Imperial Royal Gold */
+  --color-indigo-700: #815e26;  /* Deep Dynasty Bronze */
+  --color-indigo-800: #62461a;  /* Court Room Bronze */
+  --color-indigo-900: #433010;  /* Crown Royal Gold Dusk */
+  --color-indigo-950: #291c06;  /* Gold Shadow Dust */
+}
+
+body {
+  font-family: var(--font-sans);
+  background-color: #f7f5ef; /* Royal Alabaster Warm Linen */
+  color: #1a1a1f;
+  letter-spacing: 0.02em;
+}
+
+h1, .font-display {
+  font-family: var(--font-display);
+}
+
+h2, h3, h4, h5, h6 {
+  font-family: var(--font-display);
+  letter-spacing: 0.04em;
+}
+
+/* Custom micro transitions and focus states */
+.animate-fade-in {
+  animation: fadeIn 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Imperial decorative components */
+.royal-border {
+  border-image: linear-gradient(to right, #b98d45, #dfbf85, #b98d45) 1;
+}
+
+.champagne-gradient {
+  background: linear-gradient(135deg, #faf6eb 0%, #f5eedc 100%);
+}
+
+.royal-gradient {
+  background: linear-gradient(135deg, #0d1b3e 0%, #050b1d 100%);
+}
+
+.gold-gradient {
+  background: linear-gradient(135deg, #dfbf85 0%, #b98d45 100%);
+}
+
+.glow-gold {
+  box-shadow: 0 4px 25px -2px rgba(185, 141, 69, 0.3);
+}
+
+.glow-royal {
+  box-shadow: 0 10px 30px -5px rgba(13, 27, 62, 0.4);
+}
+
+/* Custom scrollbars for data tables and side menus */
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #ead2a3;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #b98d45;
+}
+
+/* Toast entrance and duration dynamic animations */
+@keyframes toastSlideIn {
+  from {
+    transform: translate3d(100%, 0, 0) scale(0.92);
+    opacity: 0;
+  }
+  to {
+    transform: translate3d(0, 0, 0) scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes toastProgressRemaining {
+  from {
+    width: 100%;
+  }
+  to {
+    width: 0%;
+  }
+}
+
+.animate-slide-in {
+  animation: toastSlideIn 240ms cubic-bezier(0.25, 1, 0.5, 1) forwards;
+}
+
+.animate-toast-progress {
+  animation: toastProgressRemaining 6000ms linear forwards;
+}

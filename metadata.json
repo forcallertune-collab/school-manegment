@@ -1,0 +1,6 @@
+{
+  "name": "EduQube",
+  "description": "EduQube is a modern, enterprise-grade cloud-based School ERP and Management Dashboard. It includes Student Profiles, Attendance Trackers, Fees & Digital Receipts, Exam Calendars & Grade Analytics, Parent Communication Boards, Staff rosters, Interactive Timetables, and a Digital Visitor Logbook.",
+  "requestFramePermissions": ["camera"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
