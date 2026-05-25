@@ -17,10 +17,13 @@ import {
   User, 
   LogOut, 
   ChevronRight,
-  ShieldAlert
+  ShieldAlert,
+  Smartphone,
+  ShieldCheck
 } from 'lucide-react';
 
 import { Student, Staff, AttendanceRecord, FeeItem, Exam, StudentResult, CommunicationAnnouncement, TimetableSlot, VisitorLog } from './types';
+import { defaultRoles, Role } from './components/RBACManager';
 import { 
   INITIAL_STUDENTS, 
   INITIAL_STAFF, 
@@ -44,6 +47,8 @@ import { ParentCommunication } from './components/ParentCommunication';
 import { StaffManager } from './components/StaffManager';
 import { TimetableManager } from './components/TimetableManager';
 import { VisitorManager } from './components/VisitorManager';
+import { BulkWhatsAppManager } from './components/BulkWhatsAppManager';
+import { RBACManager } from './components/RBACManager';
 
 // Role portals import
 import { StudentPortal } from './components/StudentPortal';
@@ -320,42 +325,52 @@ export default function App() {
 
   // Dynamic Role-based navigation items
   const NAVIGATION_BAR_ITEMS = (() => {
-    switch (activeRole) {
-      case 'student':
-        return [
-          { id: 'student-portal', label: 'My Student Hub', icon: User },
-        ];
-      case 'teacher':
-        return [
-          { id: 'teacher-portal', label: 'My Teacher Hub', icon: CheckSquare },
-        ];
-      case 'exam':
-        return [
-          { id: 'exams', label: 'Exams & Grading', icon: Award },
-        ];
-      case 'account':
-        return [
-          { id: 'account-portal', label: '₹ Finance Ledger', icon: DollarSign },
-        ];
-      case 'parent':
-        return [
-          { id: 'parent-portal', label: 'Parent Desk', icon: MessageSquare },
-        ];
-      case 'admin':
-      default:
-        return [
-          { id: 'dashboard', label: 'School Overview', icon: LayoutDashboard },
-          { id: 'students', label: 'Student Directory', icon: Users },
-          { id: 'attendance', label: 'Daily Attendance', icon: CheckSquare },
-          { id: 'fees', label: 'Fees & Finances (₹)', icon: DollarSign },
-          { id: 'exams', label: 'Exams & Reports', icon: Award },
-          { id: 'reports', label: 'Financial & Progress Reports', icon: BarChart3 },
-          { id: 'communication', label: 'Circular Bulletin', icon: MessageSquare },
-          { id: 'staff', label: 'Staff & Faculty', icon: FolderGit },
-          { id: 'timetable', label: 'Class Timetables', icon: Calendar },
-          { id: 'visitors', label: 'Visitor Logs', icon: Clock },
-        ];
+    // Generate navigation based on RBAC Matrix mapping
+    let userPermissions = defaultRoles.find(r => r.name === 'Super Admin')?.permissions;
+
+    if (activeRole === 'teacher') userPermissions = defaultRoles.find(r => r.name === 'Teacher')?.permissions;
+    if (activeRole === 'account') userPermissions = defaultRoles.find(r => r.name === 'Accountant')?.permissions;
+    // For specific sub-portals
+    if (activeRole === 'student') {
+      return [{ id: 'student-portal', label: 'My Student Hub', icon: User }];
     }
+    if (activeRole === 'parent') {
+      return [{ id: 'parent-portal', label: 'Parent Desk', icon: MessageSquare }];
+    }
+    if (activeRole === 'exam') {
+      return [{ id: 'exams', label: 'Exams & Grading', icon: Award }];
+    }
+
+    const navItems: any[] = [];
+    
+    // Always include dashboard for staff/admin 
+    if (activeRole === 'teacher') {
+      navItems.push({ id: 'teacher-portal', label: 'My Teacher Hub', icon: CheckSquare });
+    } else if (activeRole === 'account') {
+      navItems.push({ id: 'account-portal', label: '₹ Finance Ledger', icon: DollarSign });
+    } else {
+      navItems.push({ id: 'dashboard', label: 'School Overview', icon: LayoutDashboard });
+    }
+    
+    if (userPermissions?.Students.view) navItems.push({ id: 'students', label: 'Student Directory', icon: Users });
+    if (userPermissions?.Attendance.view) navItems.push({ id: 'attendance', label: 'Daily Attendance', icon: CheckSquare });
+    if (userPermissions?.Fees.view) navItems.push({ id: 'fees', label: 'Fees & Finances (₹)', icon: DollarSign });
+    if (userPermissions?.Exams.view) navItems.push({ id: 'exams', label: 'Exams & Reports', icon: Award });
+    if (userPermissions?.Staff.view) {
+      navItems.push({ id: 'staff', label: 'Staff & Faculty', icon: FolderGit });
+    }
+    if (userPermissions?.Communication.view) {
+      navItems.push({ id: 'communication', label: 'Circular Bulletin', icon: MessageSquare });
+      navItems.push({ id: 'whatsapp', label: 'Bulk WhatsApp', icon: Smartphone });
+    }
+    if (userPermissions?.Settings.view) {
+      navItems.push({ id: 'reports', label: 'Financial & Progress Reports', icon: BarChart3 });
+      navItems.push({ id: 'timetable', label: 'Class Timetables', icon: Calendar });
+      navItems.push({ id: 'visitors', label: 'Visitor Logs', icon: Clock });
+      navItems.push({ id: 'rbac', label: 'Security & Access', icon: ShieldCheck });
+    }
+
+    return navItems;
   })();
 
   const handleShortcutNavigation = (tabName: string) => {
@@ -364,39 +379,39 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-[#f7f5ef] flex font-sans text-slate-900 antialiased font-medium" id="eduqube-root">
+    <div className="min-h-screen bg-[#0B1120] flex font-sans text-white antialiased font-medium" id="eduqube-root">
       
       {/* 1. MASTER COLLAPSIBLE LEFT SIDEBAR */}
       <aside 
         id="master-sidebar"
-        className={`fixed inset-y-0 left-0 z-40 w-66 royal-gradient text-slate-100 transform transition-transform duration-300 ease-in-out md:translate-x-0 md:static md:flex md:flex-col border-r border-[#9e7534]/30 glow-royal ${
+        className={`fixed inset-y-0 left-0 z-40 w-66 bg-[#111827] text-slate-100 transform transition-transform duration-300 ease-in-out md:translate-x-0 md:static md:flex md:flex-col border-r border-[#334155]/30  ${
           isMobileSidebarOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
       >
         {/* Brand identity Header */}
-        <div className="p-6 border-b border-[#9e7534]/20 flex items-center justify-between champagne-gradient text-slate-900">
+        <div className="p-6 border-b border-[#334155]/20 flex items-center justify-between bg-[#1E293B] text-white">
           <div className="flex items-center gap-3">
-            <div className="p-2 md:p-2.5 bg-gradient-to-br from-[#9e7534] to-[#b98d45] rounded-full text-white shadow-md border border-white/40">
+            <div className="p-2 md:p-2.5 bg-gradient-to-br from-[#2563EB] to-[#2563EB] rounded-full text-white shadow-md border border-white/40">
               <School className="w-5 h-5" />
             </div>
             <div>
-              <h2 className="text-xs font-black tracking-[0.18em] text-[#433010] uppercase font-display">EduQube</h2>
-              <p className="text-[9px] text-[#815e26] font-bold uppercase tracking-wider mt-0.5 font-display">Imperial Academics</p>
+              <h2 className="text-xs font-black tracking-[0.18em] text-[#FFFFFF] uppercase font-sans">EduQube</h2>
+              <p className="text-[9px] text-white font-bold uppercase tracking-wider mt-0.5 font-sans">Imperial Academics</p>
             </div>
           </div>
           
           <button 
             id="close-mobile-nav"
             onClick={() => setIsMobileSidebarOpen(false)}
-            className="md:hidden p-1.5 text-slate-700 hover:text-slate-950 hover:bg-[#ead2a3]/30 rounded-lg cursor-pointer"
+            className="md:hidden p-1.5 text-[#CBD5E1] hover:text-white hover:bg-[#334155]/30 rounded-lg cursor-pointer"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
         {/* Interactive Persona Multi-User Switcher */}
-        <div className="px-5 py-4 border-b border-[#9e7534]/20 bg-[#050b1d]/40 space-y-2">
-          <label className="block text-[8px] font-black tracking-[0.2em] text-[#ead2a3] uppercase font-display">ERP SECURITY CONTEXT</label>
+        <div className="px-5 py-4 border-b border-[#334155]/20 bg-[#0B1120]/40 space-y-2">
+          <label className="block text-[8px] font-black tracking-[0.2em] text-[#38BDF8] uppercase font-sans">ERP SECURITY CONTEXT</label>
           <select
             id="role-portal-switcher"
             value={activeRole}
@@ -411,7 +426,7 @@ export default function App() {
               else if (role === 'account') setActiveTab('account-portal');
               else if (role === 'parent') setActiveTab('parent-portal');
             }}
-            className="w-full bg-[#050b1d]/80 text-[#dfbf85] hover:text-[#f5eedc] font-bold text-xs rounded-xl border border-[#9e7534]/30 px-3 py-2.5 outline-hidden cursor-pointer focus:border-[#dfbf85] transition-colors shadow-inner font-display"
+            className="w-full bg-[#0B1120]/80 text-[#38BDF8] hover:text-[#FFFFFF] font-bold text-xs rounded-xl border border-[#334155]/30 px-3 py-2.5 outline-hidden cursor-pointer focus:border-[#2563EB] transition-colors shadow-inner font-sans"
           >
             <option value="admin">✙ Chancellor Admin</option>
             <option value="student">✙ Scholar Portal</option>
@@ -433,75 +448,75 @@ export default function App() {
                 key={item.id}
                 id={`nav-link-${item.id}`}
                 onClick={() => handleShortcutNavigation(item.id)}
-                className={`w-full flex items-center justify-between px-3.5 py-2.5 text-xs font-bold font-display rounded-xl transition-all cursor-pointer ${
+                className={`w-full flex items-center justify-between px-3.5 py-2.5 text-xs font-bold font-sans rounded-xl transition-all cursor-pointer ${
                   isSelected 
-                    ? 'bg-gradient-to-r from-[#dfbf85] to-[#b98d45] text-[#1a1206] shadow-md font-black border border-[#faf6eb]/20' 
-                    : 'text-[#ead2a3]/80 hover:text-white hover:bg-[#ead2a3]/10'
+                    ? 'bg-gradient-to-r from-[#2563EB] to-[#38BDF8] shadow-[0_0_15px_rgba(37,99,235,0.4)] text-white shadow-md font-black border border-[#38BDF8]/20' 
+                    : 'text-[#38BDF8]/80 hover:text-white hover:bg-[#334155]/10'
                 }`}
               >
                 <div className="flex items-center gap-3">
-                  <Icon className={`w-4 h-4 shrink-0 ${isSelected ? 'text-[#1a1206]' : 'text-[#dfbf85]'}`} />
+                  <Icon className={`w-4 h-4 shrink-0 ${isSelected ? 'text-white' : 'text-[#38BDF8]'}`} />
                   <span className="tracking-wide">{item.label}</span>
                 </div>
-                {isSelected && <ChevronRight className="w-3.5 h-3.5 text-[#1a1206] shrink-0" />}
+                {isSelected && <ChevronRight className="w-3.5 h-3.5 text-white shrink-0" />}
               </button>
             );
           })}
         </nav>
 
         {/* Bottom Sidebar User status Card representing logged-in Persona */}
-        <div className="p-4 border-t border-[#9e7534]/20 shrink-0 bg-[#050b1d]/90">
+        <div className="p-4 border-t border-[#334155]/20 shrink-0 bg-[#0B1120]/90">
           {activeRole === 'admin' && (
             <div className="flex items-center gap-3 animate-fade-in">
-              <div className="w-9 h-9 rounded-full bg-gradient-to-br from-[#dfbf85] to-[#9e7534] border border-white/20 flex items-center justify-center text-[11px] text-[#1a1206] font-display font-black shrink-0 shadow-sm">GK</div>
+              <div className="w-9 h-9 rounded-full bg-gradient-to-br from-[#2563EB] to-[#1E3A8A] border border-white/20 flex items-center justify-center text-[11px] text-white font-sans font-black shrink-0 shadow-xl shadow-black/40">GK</div>
               <div className="flex-1 min-w-0">
-                <p className="text-xs font-bold text-[#faf6eb] font-display truncate">Dr. G. K. Kapoor</p>
-                <p className="text-[9px] text-[#dfbf85] font-bold uppercase tracking-widest font-display truncate mt-0.5">Dean & Chancellor</p>
+                <p className="text-xs font-bold text-white font-sans truncate">Dr. G. K. Kapoor</p>
+                <p className="text-[9px] text-[#38BDF8] font-bold uppercase tracking-widest font-sans truncate mt-0.5">Dean & Chancellor</p>
               </div>
             </div>
           )}
           {activeRole === 'student' && (
             <div className="flex items-center gap-3 animate-fade-in">
-              <div className="w-9 h-9 rounded-full bg-gradient-to-br from-[#dfbf85] to-[#9e7534] border border-white/20 flex items-center justify-center text-[11px] text-[#1a1206] font-display font-black shrink-0 shadow-sm">ST</div>
+              <div className="w-9 h-9 rounded-full bg-gradient-to-br from-[#2563EB] to-[#1E3A8A] border border-white/20 flex items-center justify-center text-[11px] text-white font-sans font-black shrink-0 shadow-xl shadow-black/40">ST</div>
               <div className="flex-1 min-w-0">
-                <p className="text-xs font-bold text-[#faf6eb] font-display truncate">Ramesh Kumar</p>
-                <p className="text-[9px] text-[#dfbf85] font-bold uppercase tracking-widest font-display truncate mt-0.5">House Valedictorian</p>
+                <p className="text-xs font-bold text-white font-sans truncate">Ramesh Kumar</p>
+                <p className="text-[9px] text-[#38BDF8] font-bold uppercase tracking-widest font-sans truncate mt-0.5">House Valedictorian</p>
               </div>
             </div>
           )}
           {activeRole === 'teacher' && (
             <div className="flex items-center gap-3 animate-fade-in">
-              <div className="w-9 h-9 rounded-full bg-gradient-to-br from-[#dfbf85] to-[#9e7534] border border-white/20 flex items-center justify-center text-[11px] text-[#1a1206] font-display font-black shrink-0 shadow-sm">AS</div>
+              <div className="w-9 h-9 rounded-full bg-gradient-to-br from-[#2563EB] to-[#1E3A8A] border border-white/20 flex items-center justify-center text-[11px] text-white font-sans font-black shrink-0 shadow-xl shadow-black/40">AS</div>
               <div className="flex-1 min-w-0">
-                <p className="text-xs font-bold text-[#faf6eb] font-display truncate">Mr. Amit Sharma</p>
-                <p className="text-[9px] text-[#dfbf85] font-bold uppercase tracking-widest font-display truncate mt-0.5">Master of Mathematics</p>
+                <p className="text-xs font-bold text-white font-sans truncate">Mr. Amit Sharma</p>
+                <p className="text-[9px] text-[#38BDF8] font-bold uppercase tracking-widest font-sans truncate mt-0.5">Master of Mathematics</p>
               </div>
             </div>
           )}
           {activeRole === 'exam' && (
             <div className="flex items-center gap-3 animate-fade-in">
-              <div className="w-9 h-9 rounded-full bg-gradient-to-br from-[#dfbf85] to-[#9e7534] border border-white/20 flex items-center justify-center text-[11px] text-[#1a1206] font-display font-black shrink-0 shadow-sm">EC</div>
+              <div className="w-9 h-9 rounded-full bg-gradient-to-br from-[#2563EB] to-[#1E3A8A] border border-white/20 flex items-center justify-center text-[11px] text-white font-sans font-black shrink-0 shadow-xl shadow-black/40">EC</div>
               <div className="flex-1 min-w-0">
-                <p className="text-xs font-bold text-[#faf6eb] font-display truncate">Mrs. Sudha Mishra</p>
-                <p className="text-[9px] text-[#dfbf85] font-bold uppercase tracking-widest font-display truncate mt-0.5">Syndic Board Regent</p>
+                <p className="text-xs font-bold text-white font-sans truncate">Mrs. Sudha Mishra</p>
+                <p className="text-[9px] text-[#38BDF8] font-bold uppercase tracking-widest font-sans truncate mt-0.5">Syndic Board Regent</p>
               </div>
             </div>
           )}
           {activeRole === 'account' && (
             <div className="flex items-center gap-3 animate-fade-in">
-              <div className="w-9 h-9 rounded-full bg-gradient-to-br from-[#dfbf85] to-[#9e7534] border border-white/20 flex items-center justify-center text-[10px] text-[#1a1206] font-display font-black shrink-0 shadow-sm">BURS</div>
+              <div className="w-9 h-9 rounded-full bg-gradient-to-br from-[#2563EB] to-[#1E3A8A] border border-white/20 flex items-center justify-center text-[10px] text-white font-sans font-black shrink-0 shadow-xl shadow-black/40">BURS</div>
               <div className="flex-1 min-w-0">
-                <p className="text-xs font-bold text-[#faf6eb] font-display truncate">Mr. Sanjay Chawla</p>
-                <p className="text-[9px] text-[#dfbf85] font-bold uppercase tracking-widest font-display truncate mt-0.5">Senior Court Bursar</p>
+                <p className="text-xs font-bold text-white font-sans truncate">Mr. Sanjay Chawla</p>
+                <p className="text-[9px] text-[#38BDF8] font-bold uppercase tracking-widest font-sans truncate mt-0.5">Senior Court Bursar</p>
               </div>
             </div>
           )}
           {activeRole === 'parent' && (
             <div className="flex items-center gap-3 animate-fade-in">
-              <div className="w-9 h-9 rounded-full bg-gradient-to-br from-[#dfbf85] to-[#9e7534] border border-white/20 flex items-center justify-center text-[11px] text-[#1a1206] font-display font-black shrink-0 shadow-sm">PR</div>
+              <div className="w-9 h-9 rounded-full bg-gradient-to-br from-[#2563EB] to-[#1E3A8A] border border-white/20 flex items-center justify-center text-[11px] text-white font-sans font-black shrink-0 shadow-xl shadow-black/40">PR</div>
               <div className="flex-1 min-w-0">
-                <p className="text-xs font-bold text-[#faf6eb] font-display truncate">Mrs. Meera Roy</p>
-                <p className="text-[9px] text-[#dfbf85] font-bold uppercase tracking-widest font-display truncate mt-0.5">House Ward Trustee</p>
+                <p className="text-xs font-bold text-white font-sans truncate">Mrs. Meera Roy</p>
+                <p className="text-[9px] text-[#38BDF8] font-bold uppercase tracking-widest font-sans truncate mt-0.5">House Ward Trustee</p>
               </div>
             </div>
           )}
@@ -512,19 +527,19 @@ export default function App() {
       <div className="flex-1 flex flex-col min-w-0" id="main-application-frame">
         
         {/* TOP COMPREHENSIVE HEADER */}
-        <header className="bg-white border-b border-[#ead2a3]/30 px-6 py-4 flex justify-between items-center shrink-0 shadow-xs" id="desktop-master-header">
+        <header className="bg-[#1E293B] border-b border-[#334155]/30 px-6 py-4 flex justify-between items-center shrink-0 shadow-lg shadow-black/20" id="desktop-master-header">
           {/* Mobile hamburger navigation button */}
           <button 
             id="open-mobile-nav"
             onClick={() => setIsMobileSidebarOpen(true)}
-            className="md:hidden p-2 text-slate-600 hover:bg-[#faf6eb] rounded-xl cursor-pointer border border-[#ead2a3]/20"
+            className="md:hidden p-2 text-[#CBD5E1] hover:bg-[#1E293B] rounded-xl cursor-pointer border border-[#334155]/20"
           >
-            <Menu className="w-5 h-5 text-[#815e26]" />
+            <Menu className="w-5 h-5 text-white" />
           </button>
 
           {/* Title description of currently rendering module */}
           <div className="hidden sm:block">
-            <h2 className="text-xs font-bold text-[#815e26] uppercase tracking-[0.2em] font-display">
+            <h2 className="text-xs font-bold text-white uppercase tracking-[0.2em] font-sans">
               EduQube Imperial Academic Console
             </h2>
           </div>
@@ -537,27 +552,27 @@ export default function App() {
               <button 
                 id="btn-alerts-toggle"
                 onClick={() => setIsNotifyOpen(!isNotifyOpen)}
-                className="p-2.5 text-slate-500 hover:text-[#9e7534] hover:bg-[#faf6eb] border border-[#ead2a3]/30 rounded-xl relative transition-all cursor-pointer"
+                className="p-2.5 text-[#94A3B8] hover:text-[#38BDF8] hover:bg-[#1E293B] border border-[#334155]/30 rounded-xl relative transition-all cursor-pointer"
                 title="Circular Feed alerts"
               >
-                <Bell className="w-4.5 h-4.5 text-[#815e26]" />
-                <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-[#b98d45] ring-2 ring-white"></span>
+                <Bell className="w-4.5 h-4.5 text-white" />
+                <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-[#38BDF8] ring-2 ring-white"></span>
               </button>
 
               {/* Toggle Notice tray drawer */}
               {isNotifyOpen && (
-                <div className="absolute right-0 mt-3 z-50 w-72 bg-white rounded-2xl border border-[#ead2a3]/40 shadow-xl p-4 text-xs space-y-3" id="alerts-drawer">
-                  <div className="flex justify-between items-center border-b border-[#faf6eb] pb-2">
-                    <span className="font-bold text-slate-800 font-display">Circular Dispatch</span>
-                    <button onClick={() => setIsNotifyOpen(false)} className="text-[10px] text-[#cca561] hover:text-[#9e7534] font-bold font-display">Dismiss</button>
+                <div className="absolute right-0 mt-3 z-50 w-72 bg-[#1E293B] rounded-2xl border border-[#334155]/40 shadow-xl p-4 text-xs space-y-3" id="alerts-drawer">
+                  <div className="flex justify-between items-center border-b border-[#1E293B] pb-2">
+                    <span className="font-bold text-white font-sans">Circular Dispatch</span>
+                    <button onClick={() => setIsNotifyOpen(false)} className="text-[10px] text-[#38BDF8] hover:text-[#38BDF8] font-bold font-sans">Dismiss</button>
                   </div>
                   
                   <div className="space-y-3 max-h-56 overflow-y-auto pr-1">
                     {announcements.slice(0, 3).map(not => (
-                      <div key={not.id} className="p-2.5 rounded-lg bg-[#faf6eb]/50 border border-[#ead2a3]/20 space-y-1">
-                        <p className="font-bold text-slate-850 truncate font-display text-[11px]">{not.title}</p>
-                        <p className="text-[10.5px] text-slate-600 line-clamp-2">{not.content}</p>
-                        <span className="text-[9.5px] text-[#9e7534] font-mono italic block mt-1">{not.date}</span>
+                      <div key={not.id} className="p-2.5 rounded-lg bg-[#1E293B]/50 border border-[#334155]/20 space-y-1">
+                        <p className="font-bold text-white truncate font-sans text-[11px]">{not.title}</p>
+                        <p className="text-[10.5px] text-[#CBD5E1] line-clamp-2">{not.content}</p>
+                        <span className="text-[9.5px] text-[#2563EB] font-mono  block mt-1">{not.date}</span>
                       </div>
                     ))}
                   </div>
@@ -566,8 +581,8 @@ export default function App() {
             </div>
 
             {/* School System Status display Tag */}
-            <div className="flex items-center gap-2 bg-[#faf6eb] px-3.5 py-1.5 rounded-xl border border-[#ead2a3]/40 text-[10.5px] text-[#815e26] font-bold font-display shadow-3xs">
-              <span className="w-1.5 h-1.5 rounded-full bg-[#b98d45] animate-pulse"></span>
+            <div className="flex items-center gap-2 bg-[#1E293B] px-3.5 py-1.5 rounded-xl border border-[#334155]/40 text-[10.5px] text-white font-bold font-sans shadow-3xs">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#38BDF8] animate-pulse"></span>
               <span className="tracking-wide">Imperial Roster: Term-1 Active</span>
             </div>
           </div>
@@ -608,6 +623,7 @@ export default function App() {
               onDeleteStudent={handleDeleteStudent}
               exams={exams}
               results={results}
+              attendance={attendance}
             />
           )}
 
@@ -660,6 +676,7 @@ export default function App() {
           {activeTab === 'staff' && (
             <StaffManager 
               staffList={staff}
+              activeRole={activeRole as any}
               onAddStaff={handleAddStaff}
               onUpdatePayroll={handleUpdateStaffPayroll}
             />
@@ -673,6 +690,12 @@ export default function App() {
             />
           )}
 
+          {activeTab === 'whatsapp' && (
+            <BulkWhatsAppManager 
+              students={students}
+            />
+          )}
+
           {activeTab === 'visitors' && (
             <VisitorManager 
               visitors={visitors}
@@ -682,9 +705,13 @@ export default function App() {
             />
           )}
 
+          {activeTab === 'rbac' && (
+            <RBACManager />
+          )}
+
           {activeTab === 'student-portal' && (
             <StudentPortal 
-              student={students.find(s=>s.id === 'STU001') || students[0]} 
+              students={students} 
               attendance={attendance}
             />
           )}

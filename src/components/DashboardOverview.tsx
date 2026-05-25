@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { 
   Users, 
   GraduationCap, 
@@ -11,8 +11,12 @@ import {
   UserCheck,
   TrendingUp,
   AlertCircle,
-  School
+  School,
+  Sparkles,
+  Zap
 } from 'lucide-react';
+import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Student, Staff, AttendanceRecord, FeeItem, VisitorLog, CommunicationAnnouncement } from '../types';
 
 interface DashboardOverviewProps {
@@ -28,6 +32,16 @@ interface DashboardOverviewProps {
   onOpenQuickAnnouncement: () => void;
 }
 
+// Mock revenue data for chart
+const revenueData = [
+  { name: 'Jan', total: 120000 },
+  { name: 'Feb', total: 180000 },
+  { name: 'Mar', total: 150000 },
+  { name: 'Apr', total: 320000 },
+  { name: 'May', total: 290000 },
+  { name: 'Jun', total: 420000 },
+];
+
 export const DashboardOverview: React.FC<DashboardOverviewProps> = ({
   students,
   staff,
@@ -42,7 +56,6 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({
 }) => {
   // 1. Calculate dynamic KPIs
   const totalStudents = students.filter(s => s.status === 'Active' || s.status === 'Suspended').length;
-  const totalStaff = staff.length;
   
   // Student Attendance Rate for today (2026-05-24) or generally for the latest date
   const todayStr = '2026-05-24';
@@ -53,354 +66,275 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({
   
   const studentAttendanceRate = totalMarkedStudents > 0 
     ? Math.round(((presentStudentsCount + leaveStudentsCount) / totalMarkedStudents) * 100) 
-    : 85; // Fallback default if not marked
+    : 85;
 
   // Revenue Calculations
   const revenueCollected = fees
     .filter(f => f.status === 'Paid')
     .reduce((sum, f) => sum + f.amount, 0);
 
-  const revenuePending = fees
-    .filter(f => f.status === 'Pending')
-    .reduce((sum, f) => sum + f.amount, 0);
+  const totalExpectedRevenue = revenueCollected + fees.filter(f => f.status !== 'Paid').reduce((s,f) => s+f.amount, 0);
+  const collectionRate = totalExpectedRevenue > 0 ? Math.round((revenueCollected / totalExpectedRevenue) * 100) : 0;
 
-  const revenueOverdue = fees
-    .filter(f => f.status === 'Overdue')
-    .reduce((sum, f) => sum + f.amount, 0);
-
-  const totalExpectedRevenue = revenueCollected + revenuePending + revenueOverdue;
-  const collectionRate = totalExpectedRevenue > 0 
-    ? Math.round((revenueCollected / totalExpectedRevenue) * 100) 
-    : 0;
-
-  // Active checked-in visitors (no checkout time)
+  // Active checked-in visitors
   const activeVisitorsCount = visitors.filter(v => v.date === todayStr && !v.checkOut).length;
 
-  // Recent 3 fee payments
-  const recentPayments = [...fees]
-    .filter(f => f.status === 'Paid' && f.paymentDate)
-    .sort((a, b) => (b.paymentDate || '').localeCompare(a.paymentDate || ''))
-    .slice(0, 3);
-
-  // Recent 3 visitors
+  // Recent visitors
   const recentVisitors = [...visitors]
     .sort((a, b) => b.checkIn.localeCompare(a.checkIn))
-    .slice(0, 3);
+    .slice(0, 4);
 
   return (
-    <div className="space-y-6 animate-fade-in" id="dashboard-overview-container">
+    <motion.div 
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4 }}
+      className="space-y-6" id="dashboard-overview-container"
+    >
       {/* Title & Date Section */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-gradient-to-r from-[#0d1b3e] to-[#050b1d] p-7 rounded-3xl shadow-md border border-[#9e7534]/30 text-white relative overflow-hidden glow-royal">
-        <div className="absolute right-0 top-0 opacity-10 pointer-events-none transform translate-x-6 -translate-y-6">
-          <School className="w-64 h-64 text-[#dfbf85]" />
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-[#1E293B] p-7 rounded-3xl shadow-lg shadow-black/20 border border-[#334155] text-white relative overflow-hidden group">
+        <div className="absolute right-0 top-0 opacity-10 pointer-events-none transform translate-x-12 -translate-y-12 group-hover:scale-110 transition-transform duration-700">
+          <School className="w-96 h-96 text-[#2563EB]" />
         </div>
         <div className="relative z-10">
-          <h1 className="text-xl md:text-2xl font-bold font-display text-[#dfbf85] tracking-wide">Chancellor's Executive Dashboard</h1>
-          <p className="text-xs text-[#ead2a3]/85 font-sans mt-1.5 italic">A real-time analytical summary of EduQube’s academic & operational treasury chambers.</p>
+          <h1 className="text-xl md:text-2xl font-bold font-sans text-white tracking-tight flex items-center gap-3">
+            NEXORAOS AI <span className="bg-[#2563EB]/20 text-[#38BDF8] text-[10px] uppercase font-bold py-1 px-2.5 rounded-full border border-[#2563EB]/40 flex items-center gap-1"><Sparkles className="w-3 h-3" /> System Nominal</span>
+          </h1>
+          <p className="text-sm text-[#94A3B8] font-sans mt-1.5">Intelligent Multi-Tenant Operations Center</p>
         </div>
-        <div className="none sm:flex relative z-10 items-center gap-2 bg-[#dfbf85]/10 px-4.5 py-2.5 rounded-xl text-[#dfbf85] border border-[#dfbf85]/35 font-display text-[11px] uppercase tracking-wider font-semibold">
-          <Clock className="w-4 h-4 text-[#dfbf85]" />
-          <span>System Date: 2026-05-24</span>
+        <div className="hidden sm:flex relative z-10 items-center gap-2 bg-[#111827] px-4.5 py-2.5 rounded-xl border border-[#334155] font-sans text-xs uppercase tracking-wider font-semibold text-[#CBD5E1]">
+          <Clock className="w-4 h-4 text-[#38BDF8]" />
+          <span>2026-05-24</span>
         </div>
       </div>
 
       {/* KPI Cards Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5" id="kpi-grid">
-        {/* KPI 1: Active Enrollment */}
-        <div className="bg-white p-5 rounded-3xl shadow-xs border border-[#ead2a3]/45 hover:border-[#b98d45]/60 transition-all duration-300 group flex items-start gap-4 hover:shadow-md hover:-translate-y-0.5">
-          <div className="p-3 bg-gradient-to-br from-[#faf6eb] to-[#f5eedc] text-[#9e7534] rounded-full border border-[#ead2a3] group-hover:scale-105 transition-all">
-            <GraduationCap className="w-6 h-6" />
-          </div>
-          <div className="flex-1">
-            <p className="text-[10px] font-bold text-[#815e26] uppercase tracking-[0.1em] font-display">Total Enrollment</p>
-            <h3 className="text-2xl font-bold text-slate-900 mt-1 font-display">{totalStudents} <span className="text-xs text-slate-400 font-sans font-normal">Scholars</span></h3>
-            <div className="flex items-center gap-1 text-[11px] text-emerald-700 mt-1.5 font-medium">
-              <TrendingUp className="w-3.5 h-3.5" />
-              <span>+4 matriculations this term</span>
+        {/* KPI 1 */}
+        <motion.div whileHover={{ y: -4, scale: 1.01 }} className="bg-[#1E293B] p-6 rounded-3xl shadow-lg border border-[#334155] hover:border-[#38BDF8]/50 hover:shadow-[0_0_20px_rgba(37,99,235,0.15)] transition-all duration-300 flex flex-col justify-between group">
+          <div className="flex justify-between items-start mb-4">
+            <div className="p-3 bg-[#2563EB]/10 text-[#38BDF8] rounded-xl border border-[#2563EB]/20 group-hover:bg-[#2563EB] group-hover:text-white transition-colors">
+              <GraduationCap className="w-5 h-5" />
             </div>
+            <span className="text-[11px] text-[#10B981] bg-[#10B981]/10 px-2 py-1 rounded-full border border-[#10B981]/20 font-medium flex items-center gap-1">
+              <TrendingUp className="w-3 h-3" /> +12%
+            </span>
           </div>
-        </div>
+          <div>
+            <h3 className="text-3xl font-bold text-white tracking-tight">{totalStudents}</h3>
+            <p className="text-xs font-medium text-[#94A3B8] uppercase tracking-wider mt-1">Total Enrollment</p>
+          </div>
+        </motion.div>
 
-        {/* KPI 2: Live Attendance Rate */}
-        <div className="bg-white p-5 rounded-3xl shadow-xs border border-[#ead2a3]/45 hover:border-[#b98d45]/60 transition-all duration-300 group flex items-start gap-4 hover:shadow-md hover:-translate-y-0.5">
-          <div className="p-3 bg-gradient-to-br from-[#faf6eb] to-[#f5eedc] text-[#9e7534] rounded-full border border-[#ead2a3] group-hover:scale-105 transition-all">
-            <UserCheck className="w-6 h-6" />
-          </div>
-          <div className="flex-1">
-            <p className="text-[10px] font-bold text-[#815e26] uppercase tracking-[0.1em] font-display">Attendance Rate</p>
-            <h3 className="text-2xl font-bold text-slate-900 mt-1 font-display">{studentAttendanceRate}%</h3>
-            <div className="flex items-center gap-1.5 mt-2">
-              <span className="w-2 h-2 rounded-full bg-[#b98d45] animate-pulse"></span>
-              <span className="text-[11px] text-[#815e26] font-medium font-display uppercase tracking-wider text-[10px]">Today Active: {presentStudentsCount}/{totalMarkedStudents}</span>
+        {/* KPI 2 */}
+        <motion.div whileHover={{ y: -4, scale: 1.01 }} className="bg-[#1E293B] p-6 rounded-3xl shadow-lg border border-[#334155] hover:border-[#38BDF8]/50 hover:shadow-[0_0_20px_rgba(37,99,235,0.15)] transition-all duration-300 flex flex-col justify-between group">
+          <div className="flex justify-between items-start mb-4">
+            <div className="p-3 bg-[#2563EB]/10 text-[#38BDF8] rounded-xl border border-[#2563EB]/20 group-hover:bg-[#2563EB] group-hover:text-white transition-colors">
+              <UserCheck className="w-5 h-5" />
+            </div>
+            <div className="flex items-center gap-1.5">
+              <span className="w-2 h-2 rounded-full bg-[#10B981] animate-pulse shadow-[0_0_8px_#10B981]"></span>
+              <span className="text-[10px] text-[#CBD5E1] font-semibold uppercase tracking-wider">Live</span>
             </div>
           </div>
-        </div>
+          <div>
+            <h3 className="text-3xl font-bold text-white tracking-tight">{studentAttendanceRate}%</h3>
+            <p className="text-xs font-medium text-[#94A3B8] uppercase tracking-wider mt-1">Daily Attendance</p>
+          </div>
+        </motion.div>
 
-        {/* KPI 3: Collected Fees */}
-        <div className="bg-white p-5 rounded-3xl shadow-xs border border-[#ead2a3]/45 hover:border-[#b98d45]/60 transition-all duration-300 group flex items-start gap-4 hover:shadow-md hover:-translate-y-0.5">
-          <div className="p-3 bg-gradient-to-br from-[#faf6eb] to-[#f5eedc] text-[#9e7534] rounded-full border border-[#ead2a3] group-hover:scale-105 transition-all">
-            <DollarSign className="w-6 h-6" />
-          </div>
-          <div className="flex-1">
-            <p className="text-[10px] font-bold text-[#815e26] uppercase tracking-[0.1em] font-display">Revenue Collected</p>
-            <h3 className="text-2xl font-bold text-slate-900 mt-1 font-display">₹{revenueCollected.toLocaleString('en-IN')}</h3>
-            <div className="w-full bg-[#f5eedc] h-1.5 rounded-full mt-3 overflow-hidden border border-[#ead2a3]/20">
-              <div 
-                className="bg-[#b98d45] h-full rounded-full transition-all duration-500 font-display" 
-                style={{ width: `${collectionRate}%` }}
-              ></div>
+        {/* KPI 3 */}
+        <motion.div whileHover={{ y: -4, scale: 1.01 }} className="bg-[#1E293B] p-6 rounded-3xl shadow-lg border border-[#334155] hover:border-[#38BDF8]/50 hover:shadow-[0_0_20px_rgba(37,99,235,0.15)] transition-all duration-300 flex flex-col justify-between group">
+          <div className="flex justify-between items-start mb-4">
+            <div className="p-3 bg-[#2563EB]/10 text-[#38BDF8] rounded-xl border border-[#2563EB]/20 group-hover:bg-[#2563EB] group-hover:text-white transition-colors">
+              <DollarSign className="w-5 h-5" />
             </div>
-            <p className="text-[11px] text-slate-500 mt-1.5 font-medium">{collectionRate}% of anticipated collections</p>
           </div>
-        </div>
+          <div>
+             <h3 className="text-3xl font-bold text-white tracking-tight">₹{(revenueCollected / 1000).toFixed(1)}k</h3>
+             <div className="w-full bg-[#111827] h-1.5 rounded-full mt-3 overflow-hidden">
+              <motion.div 
+                initial={{ width: 0 }}
+                animate={{ width: `${collectionRate}%` }}
+                transition={{ duration: 1, delay: 0.2 }}
+                className="bg-gradient-to-r from-[#2563EB] to-[#38BDF8] h-full rounded-full" 
+              ></motion.div>
+            </div>
+            <p className="text-[10px] font-medium text-[#94A3B8] uppercase tracking-wider mt-2">Revenue Realized ({collectionRate}%)</p>
+          </div>
+        </motion.div>
 
-        {/* KPI 4: Active Visitors */}
-        <div className="bg-white p-5 rounded-3xl shadow-xs border border-[#ead2a3]/45 hover:border-[#b98d45]/60 transition-all duration-300 group flex items-start gap-4 hover:shadow-md hover:-translate-y-0.5">
-          <div className="p-3 bg-gradient-to-br from-[#faf6eb] to-[#f5eedc] text-[#9e7534] rounded-full border border-[#ead2a3] group-hover:scale-105 transition-all">
-            <Clock className="w-6 h-6" />
-          </div>
-          <div className="flex-1">
-            <p className="text-[10px] font-bold text-[#815e26] uppercase tracking-[0.1em] font-display">Campus Visitors</p>
-            <h3 className="text-2xl font-bold text-slate-900 mt-1 font-display">{activeVisitorsCount} <span className="text-xs text-slate-400 font-sans font-normal">Active</span></h3>
-            <div className="flex items-center gap-1 text-[11px] text-[#9e7534] mt-1.5 font-medium">
-              <AlertCircle className="w-3.5 h-3.5" />
-              <span>Signed in at registry</span>
+        {/* KPI 4 */}
+        <motion.div whileHover={{ y: -4, scale: 1.01 }} className="bg-[#1E293B] p-6 rounded-3xl shadow-lg border border-[#334155] hover:border-[#38BDF8]/50 hover:shadow-[0_0_20px_rgba(37,99,235,0.15)] transition-all duration-300 flex flex-col justify-between group">
+          <div className="flex justify-between items-start mb-4">
+            <div className="p-3 bg-[#2563EB]/10 text-[#38BDF8] rounded-xl border border-[#2563EB]/20 group-hover:bg-[#2563EB] group-hover:text-white transition-colors">
+              <Clock className="w-5 h-5" />
             </div>
+            <span className="text-[11px] text-[#F59E0B] bg-[#F59E0B]/10 px-2 py-1 rounded-full border border-[#F59E0B]/20 font-medium flex items-center gap-1">
+              Active Now
+            </span>
           </div>
-        </div>
+          <div>
+            <h3 className="text-3xl font-bold text-white tracking-tight">{activeVisitorsCount}</h3>
+            <p className="text-xs font-medium text-[#94A3B8] uppercase tracking-wider mt-1">Campus Visitors</p>
+          </div>
+        </motion.div>
       </div>
 
-      {/* Quick Launchpad Panel */}
-      <div className="bg-gradient-to-r from-[#0d1b3e] to-[#070e24] text-white p-6.5 rounded-3xl shadow-md border border-[#9e7534]/30 glow-royal relative overflow-hidden" id="quick-action-panel">
-        <h2 className="text-sm font-bold tracking-[0.15em] uppercase text-[#dfbf85] font-display">Administrative Instant Decrees</h2>
-        <p className="text-xs text-[#ead2a3]/85 mt-1 italic font-serif">Bypass standard circular logs to record admissions, gate logs, or fee transits instantly.</p>
+      {/* Analytics Charts & AI Panel Row */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-5">
-          <button 
-            id="qa-btn-admission"
-            onClick={onOpenQuickAdmission}
-            className="flex flex-col items-center justify-center p-4 bg-[#0a1128]/80 hover:bg-[#b98d45]/20 border border-[#9e7534]/30 hover:border-[#dfbf85] rounded-2xl transition-all cursor-pointer font-display text-xs text-[#dfbf85] hover:text-white"
-          >
-            <UserPlus className="w-5 h-5 mb-2.5 text-[#dfbf85]" />
-            New Admission
-          </button>
-          
-          <button 
-            id="qa-btn-pay-fee"
-            onClick={() => onNavigate('fees')}
-            className="flex flex-col items-center justify-center p-4 bg-[#0a1128]/80 hover:bg-[#b98d45]/20 border border-[#9e7534]/30 hover:border-[#dfbf85] rounded-2xl transition-all cursor-pointer font-display text-xs text-[#dfbf85] hover:text-white"
-          >
-            <CreditCard className="w-5 h-5 mb-2.5 text-[#dfbf85]" />
-            Record Fee Receipt
-          </button>
+        {/* Core Financial Status widget using Recharts */}
+        <div className="lg:col-span-2 bg-[#1E293B] p-6 rounded-3xl shadow-lg shadow-black/20 border border-[#334155] flex flex-col justify-between">
+          <div className="flex justify-between items-center mb-6">
+            <div>
+              <h3 className="text-sm font-bold text-white uppercase tracking-wider">Revenue Forecast (AI-Assisted)</h3>
+              <p className="text-xs text-[#94A3B8] mt-1">6-month fiscal velocity against projections</p>
+            </div>
+            <div className="flex items-center gap-2 text-xs">
+              <div className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full bg-[#38BDF8]"></span><span className="text-[#94A3B8]">Actual Flow</span></div>
+            </div>
+          </div>
 
-          <button 
-            id="qa-btn-visitor"
-            onClick={onOpenQuickVisitor}
-            className="flex flex-col items-center justify-center p-4 bg-[#0a1128]/80 hover:bg-[#b98d45]/20 border border-[#9e7534]/30 hover:border-[#dfbf85] rounded-2xl transition-all cursor-pointer font-display text-xs text-[#dfbf85] hover:text-white"
-          >
-            <Clock className="w-5 h-5 mb-2.5 text-[#dfbf85]" />
-            Log Gate Entrance
-          </button>
+          <div className="h-64 w-full px-2">
+            <ResponsiveContainer width="100%" height="100%">
+              <AreaChart data={revenueData} margin={{ top: 10, right: 10, left: 10, bottom: 0 }}>
+                <defs>
+                  <linearGradient id="colorTotal" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#38BDF8" stopOpacity={0.4}/>
+                    <stop offset="95%" stopColor="#2563EB" stopOpacity={0.0}/>
+                  </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#334155" />
+                <XAxis dataKey="name" stroke="#94A3B8" fontSize={11} tickLine={false} axisLine={false} />
+                <YAxis stroke="#94A3B8" fontSize={11} tickLine={false} axisLine={false} tickFormatter={(val) => `₹${val/1000}k`} />
+                <Tooltip contentStyle={{ backgroundColor: '#111827', borderColor: '#334155', color: '#fff', borderRadius: '12px' }} itemStyle={{ color: '#38BDF8' }} />
+                <Area type="monotone" dataKey="total" stroke="#38BDF8" strokeWidth={3} fillOpacity={1} fill="url(#colorTotal)" />
+              </AreaChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
 
-          <button 
-            id="qa-btn-announcement"
-            onClick={onOpenQuickAnnouncement}
-            className="flex flex-col items-center justify-center p-4 bg-[#0a1128]/80 hover:bg-[#b98d45]/20 border border-[#9e7534]/30 hover:border-[#dfbf85] rounded-2xl transition-all cursor-pointer font-display text-xs text-[#dfbf85] hover:text-white"
-          >
-            <BellRing className="w-5 h-5 mb-2.5 text-[#dfbf85]" />
-            Circular Dispatch
-          </button>
+        {/* Floating AI Assistant Widget */}
+        <div className="lg:col-span-1 bg-[#1E293B] p-6 rounded-3xl shadow-lg border border-[#334155] relative overflow-hidden flex flex-col justify-between group hover:border-[#38BDF8]/40 hover:shadow-[0_0_25px_rgba(56,189,248,0.1)] transition-all">
+           <div className="absolute top-0 right-0 w-48 h-48 bg-[#2563EB]/15 blur-[60px] rounded-full pointer-events-none group-hover:bg-[#2563EB]/25 transition-all"></div>
+           <div>
+             <div className="flex items-center gap-3 mb-5">
+               <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-[#2563EB] to-[#38BDF8] flex items-center justify-center p-0.5 shadow-lg">
+                  <div className="w-full h-full bg-[#111827] rounded-xl flex items-center justify-center relative overflow-hidden">
+                    <div className="absolute inset-0 bg-[#2563EB]/10 z-0"></div>
+                    <Sparkles className="w-5 h-5 text-[#38BDF8] z-10" />
+                  </div>
+               </div>
+               <div>
+                  <h3 className="text-sm font-bold text-white flex items-center gap-2">NEXORA AI <span className="w-1.5 h-1.5 rounded-full bg-[#10B981] animate-pulse shadow-[0_0_6px_#10B981]"></span></h3>
+                  <p className="text-[10px] text-[#94A3B8] uppercase tracking-wider font-semibold">Predictive Operator</p>
+               </div>
+             </div>
+
+             <div className="space-y-4">
+                <div className="p-4 bg-[#111827] rounded-2xl border border-[#334155] border-l-2 border-l-[#38BDF8] group-hover:-translate-y-0.5 transition-transform">
+                   <p className="text-xs text-[#CBD5E1] leading-relaxed">
+                     <strong className="text-white block mb-1">Anomaly Detected:</strong>
+                     Attendance in Grade 10-A dropped by 18% over the last 3 days. Recommend dispatching SMS to parents.
+                   </p>
+                   <button className="mt-3 text-[10px] uppercase font-bold tracking-wider text-[#38BDF8] hover:text-white transition-colors bg-[#2563EB]/10 px-3 py-1.5 rounded-lg border border-[#2563EB]/20 hover:bg-[#2563EB]">Generate Draft</button>
+                </div>
+
+                <div className="p-4 bg-[#111827] rounded-2xl border border-[#334155] border-l-2 border-l-[#10B981] group-hover:-translate-y-0.5 transition-transform">
+                   <p className="text-xs text-[#CBD5E1] leading-relaxed">
+                     <strong className="text-white block mb-1">Financial Projection:</strong>
+                     Current fee velocity suggests you will exceed quarterly revenue targets by ₹2.4M.
+                   </p>
+                </div>
+             </div>
+           </div>
+           
+           <div className="mt-6 relative">
+              <input type="text" placeholder="Ask Nexora about trends..." className="w-full bg-[#0B1120] text-white text-xs placeholder:text-[#94A3B8] border border-[#334155] py-3.5 pl-4 pr-10 rounded-xl focus:outline-none focus:border-[#38BDF8] focus:ring-1 focus:ring-[#38BDF8]/50 transition-all" />
+              <button className="absolute right-2 top-1/2 -translate-y-1/2 p-2 text-[#38BDF8] hover:bg-[#1E293B] rounded-lg transition-colors cursor-pointer">
+                <Zap className="w-4 h-4" />
+              </button>
+           </div>
         </div>
       </div>
-
-      {/* Split Row for Visualizations & Recents */}
+      
+      {/* Quick Launchpad & Gate Logs Row */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        
-        {/* Core Financial Status widget */}
-        <div className="lg:col-span-7 bg-white p-7 rounded-3xl shadow-xs border border-[#ead2a3]/45 flex flex-col justify-between" id="financial-status-widget">
-          <div>
-            <div className="flex justify-between items-start">
-              <div>
-                <h3 className="text-base font-bold text-slate-900 font-display uppercase tracking-wider text-sm">Financial Ledger Overview</h3>
-                <p className="text-xs text-[#815e26] mt-0.5 font-sans italic">Term-1 Fee breakdown & balance ratios.</p>
-              </div>
-              <span className="text-[10px] font-display text-[#8c6225] bg-[#faf6eb] border border-[#ead2a3]/60 px-2.5 py-1 rounded-full font-bold uppercase tracking-wider">Treasury Chamber</span>
-            </div>
+          {/* Quick Launchpad Panel */}
+          <div className="lg:col-span-7 bg-[#111827] text-white p-7 rounded-3xl shadow-md border border-[#334155] relative overflow-hidden" id="quick-action-panel">
+            <h2 className="text-sm font-bold tracking-[0.15em] uppercase text-[#38BDF8]">Action Center</h2>
+            <p className="text-xs text-[#94A3B8] mt-1">Execute priority system workflows instantly.</p>
+            
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">
+              <button onClick={onOpenQuickAdmission} className="flex flex-col items-center justify-center p-5 bg-[#1E293B] hover:bg-[#2563EB] border border-[#334155] rounded-2xl transition-all cursor-pointer text-xs font-semibold text-[#CBD5E1] hover:text-white group hover:shadow-[0_0_20px_rgba(37,99,235,0.2)]">
+                <div className="w-10 h-10 rounded-full bg-[#111827] border border-[#334155] group-hover:border-[#2563EB]/40 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+                  <UserPlus className="w-4 h-4 text-[#38BDF8] group-hover:text-white" />
+                </div>
+                New Admission
+              </button>
+              
+              <button onClick={() => onNavigate('fees')} className="flex flex-col items-center justify-center p-5 bg-[#1E293B] hover:bg-[#2563EB] border border-[#334155] rounded-2xl transition-all cursor-pointer text-xs font-semibold text-[#CBD5E1] hover:text-white group hover:shadow-[0_0_20px_rgba(37,99,235,0.2)]">
+                <div className="w-10 h-10 rounded-full bg-[#111827] border border-[#334155] group-hover:border-[#2563EB]/40 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+                  <CreditCard className="w-4 h-4 text-[#38BDF8] group-hover:text-white" />
+                </div>
+                Record Fee
+              </button>
 
-            {/* Simulated mini visual ledger chart */}
-            <div className="mt-6 space-y-4">
-              <div>
-                <div className="flex justify-between text-xs font-semibold mb-1">
-                  <span className="text-slate-600">Collected Income</span>
-                  <span className="text-slate-800">₹{revenueCollected.toLocaleString()}</span>
+              <button onClick={onOpenQuickVisitor} className="flex flex-col items-center justify-center p-5 bg-[#1E293B] hover:bg-[#2563EB] border border-[#334155] rounded-2xl transition-all cursor-pointer text-xs font-semibold text-[#CBD5E1] hover:text-white group hover:shadow-[0_0_20px_rgba(37,99,235,0.2)]">
+                <div className="w-10 h-10 rounded-full bg-[#111827] border border-[#334155] group-hover:border-[#2563EB]/40 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+                  <Clock className="w-4 h-4 text-[#38BDF8] group-hover:text-white" />
                 </div>
-                <div className="w-full bg-slate-100 h-2.5 rounded-full overflow-hidden">
-                  <div className="bg-emerald-500 h-full rounded-full" style={{ width: `${(revenueCollected / totalExpectedRevenue)*100}%` }}></div>
-                </div>
-              </div>
+                Log Visitor
+              </button>
 
-              <div>
-                <div className="flex justify-between text-xs font-semibold mb-1">
-                  <span className="text-slate-600">Pending Receivables</span>
-                  <span className="text-slate-800">₹{revenuePending.toLocaleString()}</span>
+              <button onClick={onOpenQuickAnnouncement} className="flex flex-col items-center justify-center p-5 bg-[#1E293B] hover:bg-[#2563EB] border border-[#334155] rounded-2xl transition-all cursor-pointer text-xs font-semibold text-[#CBD5E1] hover:text-white group hover:shadow-[0_0_20px_rgba(37,99,235,0.2)]">
+                <div className="w-10 h-10 rounded-full bg-[#111827] border border-[#334155] group-hover:border-[#2563EB]/40 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+                  <BellRing className="w-4 h-4 text-[#38BDF8] group-hover:text-white" />
                 </div>
-                <div className="w-full bg-slate-100 h-2.5 rounded-full overflow-hidden">
-                  <div className="bg-amber-400 h-full rounded-full" style={{ width: `${(revenuePending / totalExpectedRevenue)*100}%` }}></div>
-                </div>
-              </div>
-
-              <div>
-                <div className="flex justify-between text-xs font-semibold mb-1">
-                  <span className="text-slate-600">Overdue Unpaid Balances</span>
-                  <span className="text-amber-700 font-bold">₹{revenueOverdue.toLocaleString()}</span>
-                </div>
-                <div className="w-full bg-slate-100 h-2.5 rounded-full overflow-hidden">
-                  <div className="bg-rose-500 h-full rounded-full" style={{ width: `${(revenueOverdue / totalExpectedRevenue)*100}%` }}></div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div className="mt-8 pt-4 border-t border-slate-50 flex items-center justify-between text-xs text-slate-400">
-            <span>Overall fiscal collection efficiency:</span>
-            <span className="font-bold text-slate-800 text-sm">{collectionRate}%</span>
-          </div>
-        </div>
-
-        {/* Recent Reception Desk Visitors */}
-        <div className="lg:col-span-5 bg-white p-7 rounded-3xl shadow-xs border border-[#ead2a3]/45 flex flex-col justify-between shadow-2xs" id="visitor-ledger-widget">
-          <div>
-            <div className="flex justify-between items-center mb-4">
-              <div>
-                <h3 className="text-base font-bold text-slate-900 font-display uppercase tracking-wider text-sm">Front Desk Visitor Log</h3>
-                <p className="text-xs text-[#815e26] mt-0.5 font-sans italic">Active entries registered in lobby.</p>
-              </div>
-              <button 
-                id="view-all-visitors"
-                onClick={() => onNavigate('visitors')}
-                className="text-xs text-[#9e7534] hover:text-[#815e26] font-display font-bold uppercase tracking-wider cursor-pointer transition-colors"
-              >
-                Logbook →
+                Dispatch
               </button>
             </div>
-
-            <div className="space-y-4">
-              {recentVisitors.map(v => (
-                <div key={v.id} className="flex items-center justify-between p-3 bg-slate-50/80 rounded-xl border border-slate-100">
-                  <div className="flex items-start gap-2.5">
-                    <div className="w-2.5 h-2.5 rounded-full bg-indigo-500 mt-1"></div>
-                    <div>
-                      <p className="text-xs font-bold text-slate-800">{v.name}</p>
-                      <p className="text-[10px] text-slate-400 mt-0.5">Meeting: {v.hostName} ({v.hostRole})</p>
-                    </div>
-                  </div>
-                  <div className="text-right">
-                    <p className="text-[10px] font-mono text-slate-600 font-bold">{v.checkIn}</p>
-                    <span className={`text-[9px] px-1.5 py-0.5 rounded-full mt-1 inline-block font-medium ${v.checkOut ? 'bg-slate-200/80 text-slate-600' : 'bg-emerald-100 text-emerald-800'}`}>
-                      {v.checkOut ? 'Checked Out' : 'Active'}
-                    </span>
-                  </div>
-                </div>
-              ))}
-              {recentVisitors.length === 0 && (
-                <p className="text-xs text-slate-400 text-center py-6">No visitor records found.</p>
-              )}
-            </div>
           </div>
 
-          <div className="mt-4 pt-3 border-t border-slate-50 text-[11px] text-slate-400 flex justify-between">
-            <span>Log updated 12 mins ago</span>
-            <span>Digital registration active</span>
-          </div>
-        </div>
-      </div>
-
-      {/* Staff attendance versus Student attendance quick dashboard */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        
-        {/* Latest Announcement Board widget */}
-        <div className="bg-white p-7 rounded-3xl shadow-xs border border-[#ead2a3]/45 shadow-2xs" id="announcement-board-widget">
-          <div className="flex justify-between items-center mb-4">
-            <div>
-              <h3 className="text-base font-bold text-slate-900 font-display uppercase tracking-wider text-sm">Principal Circular Roster</h3>
-              <p className="text-xs text-[#815e26] mt-0.5 font-sans italic">Disseminated circulars to parent portals.</p>
-            </div>
-            <button 
-              id="view-all-announcements"
-              onClick={() => onNavigate('communication')}
-              className="text-xs text-[#9e7534] hover:text-[#815e26] font-display font-bold uppercase tracking-wider cursor-pointer transition-colors"
-            >
-              Notice Board →
-            </button>
-          </div>
-
-          <div className="space-y-4">
-            {announcements.slice(0, 2).map(a => (
-              <div key={a.id} className="p-4 rounded-xl border border-slate-100 bg-slate-50 hover:bg-slate-50/50 transition-all">
-                <div className="flex justify-between items-start gap-2">
-                  <span className={`text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full ${
-                    a.type === 'Alert' ? 'bg-rose-50 text-rose-700 border border-rose-100' :
-                    a.type === 'Circular' ? 'bg-indigo-50 text-indigo-700 border border-indigo-100' :
-                    'bg-slate-100 text-slate-700'
-                  }`}>
-                    {a.type}
-                  </span>
-                  <span className="text-[10px] font-mono text-slate-400">{a.date}</span>
-                </div>
-                <h4 className="text-xs font-bold text-slate-800 mt-2 line-clamp-1">{a.title}</h4>
-                <p className="text-[11px] text-slate-500 mt-1 line-clamp-2">{a.content}</p>
-                <p className="text-[10px] text-slate-400 mt-2 italic">Issued by: {a.sender} ({a.role})</p>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Quick Ledger breakdown for pending payments */}
-        <div className="bg-white p-6 rounded-2xl shadow-xs border border-slate-100 flex flex-col justify-between animate-fade-in" id="recent-payments-widget">
-          <div>
-            <div className="flex justify-between items-center mb-4">
+          {/* Recent Reception Desk Visitors */}
+          <div className="lg:col-span-5 bg-[#1E293B] p-6 rounded-3xl shadow-lg border border-[#334155] flex flex-col justify-between" id="visitor-ledger-widget">
+            <div className="flex justify-between items-center mb-6">
               <div>
-                <h3 className="text-base font-bold text-slate-800">Recent Cashier Receipts</h3>
-                <p className="text-xs text-slate-400 mt-0.5">Instantly issued digital receipts.</p>
+                <h3 className="text-sm font-bold text-white uppercase tracking-wider">Gate Security Log</h3>
+                <p className="text-[10px] text-[#94A3B8] mt-0.5">Live campus entry stream</p>
               </div>
-              <button 
-                id="view-all-fees"
-                onClick={() => onNavigate('fees')}
-                className="text-xs text-indigo-600 hover:text-indigo-800 font-semibold hover:underline cursor-pointer"
-              >
-                Cashier Hub →
+              <button onClick={() => onNavigate('visitors')} className="text-[10px] text-[#38BDF8] hover:text-white font-bold uppercase tracking-wider transition-colors px-3 py-1.5 rounded-lg border border-[#334155] hover:border-[#38BDF8]">
+                View All
               </button>
             </div>
 
             <div className="space-y-3">
-              {recentPayments.map(p => (
-                <div key={p.id} className="flex justify-between items-center p-3 bg-indigo-50/20 border border-indigo-50 rounded-xl">
-                  <div>
-                    <p className="text-xs font-bold text-slate-800">{p.studentName}</p>
-                    <p className="text-[10px] text-slate-500">{p.title}</p>
-                    <p className="text-[9px] font-mono text-slate-400">RC: {p.receiptNo}</p>
+              {recentVisitors.map((v, i) => (
+                <motion.div initial={{ opacity: 0, x: 10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.1 * i }} key={v.id} className="flex items-center justify-between p-3.5 bg-[#111827] hover:bg-[#1E293B] rounded-2xl border border-[#334155] hover:border-[#38BDF8]/40 transition-colors cursor-default">
+                  <div className="flex items-start gap-3">
+                    <div className="w-8 h-8 rounded-full bg-[#2563EB]/10 border border-[#2563EB]/30 flex items-center justify-center text-[#38BDF8] font-bold text-[10px]">
+                       {v.name.charAt(0)}
+                    </div>
+                    <div>
+                      <p className="text-xs font-bold text-white">{v.name}</p>
+                      <p className="text-[10px] text-[#94A3B8] mt-0.5">Host: {v.hostName}</p>
+                    </div>
                   </div>
                   <div className="text-right">
-                    <p className="text-xs font-bold text-emerald-700 font-mono">+₹{p.amount}</p>
-                    <span className="text-[9px] text-slate-400 font-mono block mt-0.5">{p.paymentDate}</span>
+                    <p className="text-[10px] text-[#CBD5E1] font-medium">{v.checkIn}</p>
+                    <span className={`text-[8px] uppercase tracking-wider px-2 py-0.5 rounded-full mt-1.5 inline-block font-bold border ${v.checkOut ? 'bg-[#334155]/30 text-[#94A3B8] border-[#334155]' : 'bg-[#10B981]/10 text-[#10B981] border-[#10B981]/30'}`}>
+                      {v.checkOut ? 'Departed' : 'Active'}
+                    </span>
                   </div>
-                </div>
+                </motion.div>
               ))}
-              {recentPayments.length === 0 && (
-                <p className="text-xs text-slate-400 text-center py-6">No receipt recordings logged yet.</p>
+              {recentVisitors.length === 0 && (
+                <div className="text-center py-6 text-[#94A3B8] text-xs">No recent visitors today.</div>
               )}
             </div>
           </div>
-
-          <div className="pt-3 border-t border-slate-50 flex justify-between items-center text-[10px] text-slate-400">
-            <span>Audit Trail compliant</span>
-            <span className="text-emerald-600 flex items-center gap-1">
-              <CheckCircle className="w-3 h-3" /> Ledger Locked
-            </span>
-          </div>
-        </div>
       </div>
-    </div>
+    </motion.div>
   );
 };

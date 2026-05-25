@@ -472,6 +472,139 @@ Return clean, readable, professional responses with clear headers.`;
     }
   });
 
+  // API Route: Check biometric device status
+  app.get('/api/biometry/device-status', (req, res) => {
+    // Simulated hardware check
+    res.json({
+      success: true,
+      device: {
+        model: 'BIO-X-900',
+        firmware: 'v2.1.0',
+        status: 'online',
+        lastPing: new Date().toISOString(),
+        batteryLevel: '98%',
+        storageUsed: '15%'
+      }
+    });
+  });
+
+  // API Route: Register new biometric fingerprint template
+  app.post('/api/biometry/register', (req, res) => {
+    try {
+      const { userId, role, templateData } = req.body;
+      
+      if (!userId || !role) {
+        return res.status(400).json({ error: 'Missing userId or role for biometric registration.' });
+      }
+
+      // Here you would connect to hardware SDK or store the encrypted template data securely
+      // Mocking hardware success response
+      const hardwareConfigToken = `TOKEN-${Date.now().toString(16).toUpperCase()}`;
+
+      res.json({
+        success: true,
+        message: `Successfully registered biometric template for ${role} ID ${userId}.`,
+        hardwareToken: hardwareConfigToken,
+        status: 'active'
+      });
+    } catch (err: any) {
+      res.status(500).json({ success: false, error: err.message });
+    }
+  });
+
+  // API Route: Verify biometric fingerprint and mark attendance
+  app.post('/api/biometry/verify', (req, res) => {
+    try {
+      const { templateData, deviceLocation } = req.body;
+      
+      // In a real scenario, templateData is matched against stored templates via SDK
+      // Using mock authentication
+      if (!templateData) {
+        return res.status(400).json({ error: 'No scan data received from scanner hardware.' });
+      }
+
+      // Mocked identified user
+      const matchedUserId = 'STU001'; 
+      const scannedTime = new Date().toISOString();
+
+      res.json({
+        success: true,
+        matchFound: true,
+        userId: matchedUserId,
+        role: 'student',
+        scanTime: scannedTime,
+        location: deviceLocation || 'Main Gate Scanner A',
+        message: 'Attendance validated.'
+      });
+    } catch (err: any) {
+      res.status(500).json({ success: false, error: err.message });
+    }
+  });
+
+  // API Route: Bulk sync offline biometric logs from scanner hardware
+  app.post('/api/biometry/sync', (req, res) => {
+    try {
+      const { deviceId, offlineLogs = [] } = req.body;
+      
+      if (!deviceId) {
+        return res.status(400).json({ error: 'Device ID required for synchronization.' });
+      }
+
+      const syncCount = offlineLogs.length;
+
+      res.json({
+        success: true,
+        syncedCount: syncCount,
+        message: `Successfully synchronized ${syncCount} offline access logs from device ${deviceId}.`,
+        bufferCleared: true
+      });
+    } catch (err: any) {
+      res.status(500).json({ success: false, error: err.message });
+    }
+  });
+
+  // Enterprise RBAC Module endpoints (simulated)
+  app.get('/api/rbac/roles', (req, res) => {
+    // Validate session & token here
+    res.json({
+       success: true,
+       roles: [
+         { id: 'R1', name: 'School Owner', isSystem: true },
+         { id: 'R2', name: 'Principal', isSystem: true },
+       ]
+    });
+  });
+
+  app.post('/api/rbac/roles/:roleId/permissions', (req, res) => {
+    // Audit log insertion happens here
+    res.json({
+       success: true,
+       message: 'Role permissions strategically updated.',
+       auditLogId: `LOG-${Date.now()}`
+    });
+  });
+
+  // --- RBAC (Simulated Enterprise Endpoints) ---
+  app.get('/api/rbac/roles', (req, res) => {
+    // Validate session & token here
+    res.json({
+       success: true,
+       roles: [
+         { id: 'R1', name: 'School Owner', isSystem: true },
+         { id: 'R2', name: 'Principal', isSystem: true },
+       ]
+    });
+  });
+
+  app.post('/api/rbac/roles/:roleId/permissions', (req, res) => {
+    // Audit log insertion happens here
+    res.json({
+       success: true,
+       message: 'Role permissions strategically updated.',
+       auditLogId: `LOG-${Date.now()}`
+    });
+  });
+
   // API Route Check: Server Status
   app.get('/api/health', (req, res) => {
     res.json({ status: 'ok', time: new Date().toISOString() });

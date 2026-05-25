@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   CheckCircle2, 
   XCircle, 
@@ -14,7 +14,12 @@ import {
   Printer,
   Download,
   Crown,
-  X
+  X,
+  Fingerprint,
+  Wifi,
+  WifiOff,
+  RefreshCw,
+  UploadCloud
 } from 'lucide-react';
 import { Student, Staff, AttendanceRecord } from '../types';
 
@@ -43,6 +48,104 @@ export const AttendanceManager: React.FC<AttendanceManagerProps> = ({
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
   const [exportClass, setExportClass] = useState('Class 10');
   const [exportDate, setExportDate] = useState('2026-05-24');
+
+  // Biometric integration states
+  const [bioStatus, setBioStatus] = useState<'checking' | 'online' | 'offline'>('checking');
+  const [isScanning, setIsScanning] = useState(false);
+  const [isSyncing, setIsSyncing] = useState(false);
+  const [scanMessage, setScanMessage] = useState<{ text: string, type: 'success' | 'error' | 'info' } | null>(null);
+
+  useEffect(() => {
+    checkBioDeviceStatus();
+  }, []);
+
+  const checkBioDeviceStatus = async () => {
+    setBioStatus('checking');
+    try {
+      const res = await fetch('/api/biometry/device-status');
+      if (res.ok) {
+        const data = await res.json();
+        if (data.success && data.device.status === 'online') {
+          setBioStatus('online');
+        } else {
+          setBioStatus('offline');
+        }
+      } else {
+        setBioStatus('offline');
+      }
+    } catch (err) {
+      setBioStatus('offline');
+    }
+  };
+
+  const showScanAlert = (text: string, type: 'success' | 'error' | 'info') => {
+    setScanMessage({ text, type });
+    setTimeout(() => setScanMessage(null), 5000);
+  };
+
+  const handleBioScan = async () => {
+    setIsScanning(true);
+    try {
+      // Simulate hardware trigger
+      const payload = { templateData: '0xABC123FINGERPRINT_TEMPLATE', deviceLocation: 'Terminal 1' };
+      const res = await fetch('/api/biometry/verify', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      const data = await res.json();
+      
+      if (res.ok && data.success && data.matchFound) {
+        // Find matching student/staff in local arrays to verify they exist in this school DB
+        const isTargetStudent = data.role === 'student';
+        const personList = isTargetStudent ? students : staff;
+        // Since students array only has Student type from types.ts, cast to any or use explicit check
+        const person = (personList as any[]).find(p => p.id === data.userId);
+
+        if (person) {
+          onUpsertAttendance(
+            selectedDate, 
+            person.id, 
+            isTargetStudent ? 'Student' : 'Staff', 
+            'Present', 
+            `Biometric Auth @ ${new Date(data.scanTime).toLocaleTimeString()}`
+          );
+          showScanAlert(`Verified: ${person.name} (${data.userId}) marked Present.`, 'success');
+        } else {
+          showScanAlert(`Match found for ID ${data.userId}, but person not found in database.`, 'error');
+        }
+      } else {
+        showScanAlert('Fingerprint unrecognized. Please try again.', 'error');
+      }
+    } catch (err) {
+      showScanAlert('Connection to secure biometric service failed.', 'error');
+      setBioStatus('offline');
+    } finally {
+      setIsScanning(false);
+    }
+  };
+
+  const handleSyncLogs = async () => {
+    setIsSyncing(true);
+    try {
+      const res = await fetch('/api/biometry/sync', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ deviceId: 'BIO-X-900', offlineLogs: [1, 2, 3] })
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+         showScanAlert(`Successfully synced ${data.syncedCount} offline biometric logs.`, 'info');
+      } else {
+         showScanAlert('Failed to sync offline logs.', 'error');
+      }
+    } catch (err) {
+      showScanAlert('Network error during offline sync.', 'error');
+      setBioStatus('offline');
+    } finally {
+      setIsSyncing(false);
+    }
+  };
 
   // 1. Get filtered list of members
   const activeMembersOrStudents = targetType === 'Student' 
@@ -123,20 +226,20 @@ export const AttendanceManager: React.FC<AttendanceManagerProps> = ({
   return (
     <div className="space-y-6" id="attendance-manager-container">
       {/* Title Header summary banner */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-white p-6 rounded-3xl shadow-xs border border-[#ead2a3]/40">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-[#1E293B] p-6 rounded-3xl shadow-lg shadow-black/20 border border-[#334155]/40">
         <div>
-          <h1 className="text-lg md:text-xl font-bold text-slate-900 tracking-wide flex items-center gap-2.5 font-display text-[16px] md:text-[20px]">
-            <Crown className="text-[#b98d45] w-5.5 h-5.5" />
+          <h1 className="text-lg md:text-xl font-bold text-white tracking-wide flex items-center gap-2.5 font-sans text-[16px] md:text-[20px]">
+            <Crown className="text-[#2563EB] w-5.5 h-5.5" />
             ATTENDANCE REGISTRY
           </h1>
-          <p className="text-xs text-[#815e26] mt-1 font-serif italic">Review physical presence logs, verify leaves, and endorse official assembly rolls.</p>
+          <p className="text-xs text-white mt-1 font-serif ">Review physical presence logs, verify leaves, and endorse official assembly rolls.</p>
         </div>
         
         {/* Interactive action controls */}
         <div className="flex flex-wrap items-center gap-3 w-full md:w-auto shrink-0 justify-start md:justify-end">
           {/* Date Selector input */}
-          <div className="flex items-center gap-2 bg-[#faf6eb] border border-[#ead2a3]/60 rounded-xl px-3 py-2 focus-within:border-[#b98d45] transition-all shadow-3xs">
-            <Calendar className="w-4 h-4 text-[#815e26]" />
+          <div className="flex items-center gap-2 bg-[#1E293B] border border-[#334155]/60 rounded-xl px-3 py-2 focus-within:border-[#2563EB] transition-all shadow-3xs">
+            <Calendar className="w-4 h-4 text-white" />
             <input 
               type="date"
               id="attendance-date-picker"
@@ -145,7 +248,7 @@ export const AttendanceManager: React.FC<AttendanceManagerProps> = ({
                 setSelectedDate(e.target.value);
                 setExportDate(e.target.value);
               }}
-              className="text-xs text-[#815e26] font-bold font-mono bg-transparent outline-hidden cursor-pointer"
+              className="text-xs text-white font-bold font-mono bg-transparent outline-hidden cursor-pointer"
             />
           </div>
 
@@ -157,10 +260,10 @@ export const AttendanceManager: React.FC<AttendanceManagerProps> = ({
               setExportDate(selectedDate);
               setIsExportModalOpen(true);
             }}
-            className="flex items-center gap-1.5 px-4 py-2 bg-gradient-to-r from-[#9e7534] to-[#b98d45] hover:from-[#815e26] hover:to-[#9e7534] text-white font-display font-bold rounded-xl text-xs cursor-pointer transition-all shadow-3xs whitespace-nowrap"
+            className="flex items-center gap-1.5 px-4 py-2 bg-gradient-to-r from-[#2563EB] to-[#2563EB] hover:from-[#94A3B8] hover:to-[#2563EB] text-white font-sans font-bold rounded-xl text-xs cursor-pointer transition-all shadow-3xs whitespace-nowrap"
             title="Generate and print bespoke official class register ledger document"
           >
-            <Printer className="w-4 h-4 text-[#faf6eb]" />
+            <Printer className="w-4 h-4 text-white" />
             <span>Generate Official PDF</span>
           </button>
         </div>
@@ -170,16 +273,16 @@ export const AttendanceManager: React.FC<AttendanceManagerProps> = ({
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         
         {/* Left Control pane: switch roles, browse classes, search */}
-        <div className="lg:col-span-4 space-y-5 bg-white p-5 rounded-2xl shadow-xs border border-slate-100 flex flex-col justify-between" id="attendance-filters-card">
+        <div className="lg:col-span-4 space-y-5 bg-[#1E293B] p-5 rounded-2xl shadow-lg shadow-black/20 border border-[#334155] flex flex-col justify-between" id="attendance-filters-card">
           <div className="space-y-4">
-            <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Category Selection</h3>
+            <h3 className="text-xs font-bold text-[#94A3B8] uppercase tracking-wider mb-2">Category Selection</h3>
             
             {/* Student vs Staff toggle */}
-            <div className="grid grid-cols-2 gap-2 bg-slate-100 p-1 rounded-xl">
+            <div className="grid grid-cols-2 gap-2 bg-[#273549] p-1 rounded-xl">
               <button
                 id="tab-select-students"
                 onClick={() => { setTargetType('Student'); setSearchQuery(''); }}
-                className={`py-2 px-3 text-xs font-semibold rounded-lg flex items-center justify-center gap-2 cursor-pointer transition-all ${targetType === 'Student' ? 'bg-white text-emerald-800 shadow-xs' : 'text-slate-500 hover:text-slate-800'}`}
+                className={`py-2 px-3 text-xs font-semibold rounded-lg flex items-center justify-center gap-2 cursor-pointer transition-all ${targetType === 'Student' ? 'bg-[#1E293B] text-[#10B981] shadow-lg shadow-black/20' : 'text-[#94A3B8] hover:text-white'}`}
               >
                 <Users className="w-4 h-4" />
                 Students
@@ -187,7 +290,7 @@ export const AttendanceManager: React.FC<AttendanceManagerProps> = ({
               <button
                 id="tab-select-staff"
                 onClick={() => { setTargetType('Staff'); setSearchQuery(''); }}
-                className={`py-2 px-3 text-xs font-semibold rounded-lg flex items-center justify-center gap-2 cursor-pointer transition-all ${targetType === 'Staff' ? 'bg-white text-emerald-800 shadow-xs' : 'text-slate-500 hover:text-slate-800'}`}
+                className={`py-2 px-3 text-xs font-semibold rounded-lg flex items-center justify-center gap-2 cursor-pointer transition-all ${targetType === 'Staff' ? 'bg-[#1E293B] text-[#10B981] shadow-lg shadow-black/20' : 'text-[#94A3B8] hover:text-white'}`}
               >
                 <Briefcase className="w-4 h-4" />
                 Staff / Faculty
@@ -197,7 +300,7 @@ export const AttendanceManager: React.FC<AttendanceManagerProps> = ({
             {/* If Student, show Class Selector */}
             {targetType === 'Student' && (
               <div className="space-y-1.5" id="attendance-class-selection">
-                <label className="block text-xs font-bold text-slate-500">Pick Target Grade Roster</label>
+                <label className="block text-xs font-bold text-[#94A3B8]">Pick Target Grade Roster</label>
                 <div className="grid grid-cols-3 gap-2">
                   {['Class 10', 'Class 9', 'Class 8'].map((cls) => (
                     <button
@@ -206,8 +309,8 @@ export const AttendanceManager: React.FC<AttendanceManagerProps> = ({
                       onClick={() => setSelectedClass(cls)}
                       className={`py-2 text-[11px] font-mono font-bold rounded-lg border transition-all cursor-pointer ${
                         selectedClass === cls 
-                          ? 'bg-indigo-50 border-indigo-400 text-indigo-700 font-bold' 
-                          : 'bg-slate-50 hover:bg-slate-100 border-slate-100 text-slate-600'
+                          ? 'bg-[#2563EB]/10 border border-[#2563EB]/30 border-indigo-400 text-[#38BDF8] font-bold' 
+                          : 'bg-[#111827] hover:bg-[#273549] border-[#334155] text-[#CBD5E1]'
                       }`}
                     >
                       {cls}
@@ -219,85 +322,128 @@ export const AttendanceManager: React.FC<AttendanceManagerProps> = ({
 
             {/* Search Input Filter */}
             <div className="relative">
-              <Search className="absolute left-3 top-2.5 h-3.5 w-3.5 text-slate-400" />
+              <Search className="absolute left-3 top-2.5 h-3.5 w-3.5 text-[#94A3B8]" />
               <input 
                 type="text"
                 id="attendance-search-input"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder={`Search ${targetType.toLowerCase()} by name...`}
-                className="w-full bg-slate-50 pl-9 pr-3 py-2 text-xs rounded-lg border border-slate-200 focus:bg-white focus:border-indigo-500 outline-hidden transition-all text-slate-700 font-medium"
+                className="w-full bg-[#111827] pl-9 pr-3 py-2 text-xs rounded-lg border border-[#334155] focus:bg-[#1E293B] focus:border-indigo-500 outline-hidden transition-all text-[#CBD5E1] font-medium"
               />
             </div>
           </div>
 
           {/* Quick Actions Shortcuts */}
           <div className="pt-4 border-t border-slate-50 space-y-3">
-            <h4 className="text-xs font-bold text-slate-500">Batch Processing</h4>
+            <h4 className="text-xs font-bold text-[#94A3B8]">Batch Processing</h4>
             <button
               id="btn-mark-all-present"
               onClick={handleBatchPresent}
-              className="w-full py-2 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 text-emerald-700 text-xs font-semibold rounded-xl transition-all cursor-pointer flex items-center justify-center gap-2"
+              className="w-full py-2 bg-[#10B981]/10 border border-[#10B981]/30 hover:bg-[#10B981]/20 border border-emerald-200 text-[#10B981] text-xs font-semibold rounded-xl transition-all cursor-pointer flex items-center justify-center gap-2"
             >
               <Check className="w-4 h-4" />
               Mark All Unmarked as Present
             </button>
-            <p className="text-[10px] text-slate-400 leading-snug">
+            <p className="text-[10px] text-[#94A3B8] leading-snug mb-4">
               This sets all unmarked entries in the currently displayed selection list as **Present** for the selected date.
             </p>
+
+            <h4 className="text-xs font-bold text-[#94A3B8] mt-4 border-t border-[#334155] pt-4">Biometric Hardware Link</h4>
+            
+            <div className={`p-3 rounded-xl border flex flex-col items-center justify-center gap-2 text-center transition-all ${bioStatus === 'online' ? 'bg-[#2563EB]/10 border border-[#2563EB]/30/50 border-indigo-200' : 'bg-[#111827] border-[#334155]'}`}>
+              <div className="flex items-center gap-2 mb-1 text-[10px] font-mono tracking-wider font-bold">
+                {bioStatus === 'checking' && <span className="text-[#94A3B8]">CHECKING DEVICE...</span>}
+                {bioStatus === 'online' && <><Wifi className="w-3.5 h-3.5 text-indigo-500" /> <span className="text-[#2563EB]">DEVICE ONLINE: BIO-X-900</span></>}
+                {bioStatus === 'offline' && <><WifiOff className="w-3.5 h-3.5 text-[#94A3B8]" /> <span className="text-[#94A3B8]">DEVICE OFFLINE</span></>}
+              </div>
+
+              <button
+                onClick={handleBioScan}
+                disabled={bioStatus !== 'online' || isScanning}
+                className="w-full py-3 bg-gradient-to-r from-indigo-600 to-indigo-800 hover:from-indigo-700 hover:to-indigo-900 text-white text-[11px] uppercase tracking-wide font-bold rounded-xl transition-all shadow-md active:scale-95 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+              >
+                {isScanning ? (
+                  <RefreshCw className="w-4 h-4 animate-spin text-indigo-200" />
+                ) : (
+                  <Fingerprint className="w-4 h-4 text-indigo-100" />
+                )}
+                {isScanning ? 'Processing Scan...' : 'Trigger Biometric Scan'}
+              </button>
+
+              <button
+                onClick={handleSyncLogs}
+                disabled={bioStatus !== 'online' || isSyncing}
+                className="w-full py-2 bg-[#1E293B] hover:bg-[#111827] border border-[#334155] text-[#CBD5E1] text-[10px] uppercase font-bold rounded-lg transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+              >
+                 {isSyncing ? <RefreshCw className="w-3 h-3 animate-spin text-[#94A3B8]" /> : <UploadCloud className="w-3 h-3 text-[#94A3B8]" />}
+                 Sync Offline Scanner Logs
+              </button>
+
+              {scanMessage && (
+                <div className={`mt-2 p-2.5 rounded-lg w-full text-[10.5px] text-left leading-tight font-medium ${
+                  scanMessage.type === 'success' ? 'bg-[#10B981]/20 text-emerald-850 border border-emerald-200' :
+                  scanMessage.type === 'error' ? 'bg-rose-100 text-rose-850 border border-rose-200' :
+                  'bg-[#2563EB]/20 text-indigo-850 border border-indigo-200'
+                }`}>
+                  {scanMessage.text}
+                </div>
+              )}
+            </div>
+
           </div>
         </div>
 
         {/* Right Pane: Attendance status stats & list of names */}
-        <div className="lg:col-span-8 bg-white p-6 rounded-2xl shadow-xs border border-slate-100 space-y-6" id="attendance-roster-list">
+        <div className="lg:col-span-8 bg-[#1E293B] p-6 rounded-2xl shadow-lg shadow-black/20 border border-[#334155] space-y-6" id="attendance-roster-list">
           {/* visual aggregate tracker bar */}
-          <div className="p-4 bg-slate-50/80 rounded-2xl border border-slate-100 grid grid-cols-4 gap-4 text-center">
+          <div className="p-4 bg-[#111827]/80 rounded-2xl border border-[#334155] grid grid-cols-4 gap-4 text-center">
             <div className="space-y-1">
-              <p className="text-[10px] text-slate-400 uppercase tracking-wider font-bold">Total Directory</p>
-              <p className="text-xl font-black text-slate-800">{totalInGroup}</p>
+              <p className="text-[10px] text-[#94A3B8] uppercase tracking-wider font-bold">Total Directory</p>
+              <p className="text-xl font-black text-white">{totalInGroup}</p>
             </div>
-            <div className="space-y-1 border-l border-slate-200">
-              <p className="text-[10px] text-emerald-600 uppercase tracking-wider font-bold">Present ✅</p>
-              <p className="text-l font-black text-emerald-700">{presentCount}</p>
+            <div className="space-y-1 border-l border-[#334155]">
+              <p className="text-[10px] text-[#10B981] uppercase tracking-wider font-bold">Present ✅</p>
+              <p className="text-l font-black text-[#10B981]">{presentCount}</p>
             </div>
-            <div className="space-y-1 border-l border-slate-200">
+            <div className="space-y-1 border-l border-[#334155]">
               <p className="text-[10px] text-rose-500 uppercase tracking-wider font-bold">Absent ❌</p>
               <p className="text-l font-black text-rose-700">{absentCount}</p>
             </div>
-            <div className="space-y-1 border-l border-slate-200">
+            <div className="space-y-1 border-l border-[#334155]">
               <p className="text-[10px] text-amber-500 uppercase tracking-wider font-bold">Ex. Leave ✉️</p>
-              <p className="text-l font-black text-amber-700">{leaveCount}</p>
+              <p className="text-l font-black text-[#F59E0B]">{leaveCount}</p>
             </div>
           </div>
 
           {/* Table representing actual names */}
-          <div className="rounded-xl border border-slate-100 overflow-hidden">
+          <div className="rounded-xl border border-[#334155] overflow-hidden">
             <table className="w-full text-left border-collapse" id="attendance-interactive-table">
               <thead>
-                <tr className="bg-slate-50 border-b border-slate-100 text-[11px] text-slate-400 font-mono italic">
+                <tr className="bg-[#111827] border-b border-[#334155] text-[11px] text-[#94A3B8] font-mono ">
                   <th className="p-3">Candidate Reference</th>
                   <th className="p-3">Status Toggle</th>
                   <th className="p-3">Explanatory Memo Draft</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-50">
+              <tbody className="divide-y divide-[#334155]">
                 {displayedMembers.map((member) => {
                   const status = getAttendanceStatus(member.id);
                   const notes = getAttendanceNotes(member.id);
                   
                   return (
-                    <tr key={member.id} className="hover:bg-slate-50/30 transition-all font-sans" id={`attendance-row-${member.id}`}>
+                    <tr key={member.id} className="hover:bg-[#111827]/30 transition-all font-sans" id={`attendance-row-${member.id}`}>
                       {/* Name and info */}
                       <td className="p-3">
                         <div className="flex items-center gap-2.5">
                           <div className={`w-1.5 h-6 rounded-full ${
-                            status === 'Present' ? 'bg-emerald-500' :
-                            status === 'Absent' ? 'bg-rose-500' :
-                            status === 'Leave' ? 'bg-amber-500' : 'bg-slate-300'
+                            status === 'Present' ? 'bg-[#10B981]/10 border border-[#10B981]/300' :
+                            status === 'Absent' ? 'bg-[#EF4444]/10 border border-[#EF4444]/300' :
+                            status === 'Leave' ? 'bg-[#F59E0B]/10 border border-[#F59E0B]/300' : 'bg-slate-300'
                           }`}></div>
                           <div>
-                            <p className="text-xs font-bold text-slate-800">{member.name}</p>
-                            <p className="text-[9px] font-mono text-slate-400">
+                            <p className="text-xs font-bold text-white">{member.name}</p>
+                            <p className="text-[9px] font-mono text-[#94A3B8]">
                               ID: {member.id} {targetType === 'Student' ? `(Roll: ${(member as Student).rollNo})` : `(${(member as Staff).designation})`}
                             </p>
                           </div>
@@ -313,12 +459,12 @@ export const AttendanceManager: React.FC<AttendanceManagerProps> = ({
                             onClick={() => onUpsertAttendance(selectedDate, member.id, targetType, 'Present', notes)}
                             className={`p-1.5 text-[10px] font-bold rounded-lg border transition-all cursor-pointer select-none flex items-center gap-1 ${
                               status === 'Present'
-                                ? 'bg-emerald-50 border-emerald-300 text-emerald-800 shadow-xs'
-                                : 'bg-white hover:bg-slate-50 border-slate-100 text-slate-400'
+                                ? 'bg-[#10B981]/10 border border-[#10B981]/30 border-emerald-300 text-[#10B981] shadow-lg shadow-black/20'
+                                : 'bg-[#1E293B] hover:bg-[#111827] border-[#334155] text-[#94A3B8]'
                             }`}
                             title="Mark Present"
                           >
-                            <CheckCircle2 className={`w-3.5 h-3.5 ${status === 'Present' ? 'text-emerald-600' : 'text-slate-300'}`} />
+                            <CheckCircle2 className={`w-3.5 h-3.5 ${status === 'Present' ? 'text-[#10B981]' : 'text-slate-300'}`} />
                             <span className="sr-only sm:not-sr-only">Present</span>
                           </button>
 
@@ -328,12 +474,12 @@ export const AttendanceManager: React.FC<AttendanceManagerProps> = ({
                             onClick={() => onUpsertAttendance(selectedDate, member.id, targetType, 'Absent', notes)}
                             className={`p-1.5 text-[10px] font-bold rounded-lg border transition-all cursor-pointer select-none flex items-center gap-1 ${
                               status === 'Absent'
-                                ? 'bg-rose-50 border-rose-300 text-rose-800 shadow-xs'
-                                : 'bg-white hover:bg-slate-50 border-slate-100 text-slate-400'
+                                ? 'bg-[#EF4444]/10 border border-[#EF4444]/30 border-rose-300 text-[#EF4444] shadow-lg shadow-black/20'
+                                : 'bg-[#1E293B] hover:bg-[#111827] border-[#334155] text-[#94A3B8]'
                             }`}
                             title="Mark Absent"
                           >
-                            <XCircle className={`w-3.5 h-3.5 ${status === 'Absent' ? 'text-rose-600' : 'text-slate-300'}`} />
+                            <XCircle className={`w-3.5 h-3.5 ${status === 'Absent' ? 'text-[#EF4444]' : 'text-slate-300'}`} />
                             <span className="sr-only sm:not-sr-only">Absent</span>
                           </button>
 
@@ -343,8 +489,8 @@ export const AttendanceManager: React.FC<AttendanceManagerProps> = ({
                             onClick={() => onUpsertAttendance(selectedDate, member.id, targetType, 'Leave', notes)}
                             className={`p-1.5 text-[10px] font-bold rounded-lg border transition-all cursor-pointer select-none flex items-center gap-1 ${
                               status === 'Leave'
-                                ? 'bg-amber-50 border-amber-300 text-amber-800 shadow-xs'
-                                : 'bg-white hover:bg-slate-50 border-slate-100 text-slate-400'
+                                ? 'bg-[#F59E0B]/10 border border-[#F59E0B]/30 border-amber-300 text-[#F59E0B] shadow-lg shadow-black/20'
+                                : 'bg-[#1E293B] hover:bg-[#111827] border-[#334155] text-[#94A3B8]'
                             }`}
                             title="Mark Leave"
                           >
@@ -362,7 +508,7 @@ export const AttendanceManager: React.FC<AttendanceManagerProps> = ({
                           value={notes}
                           onChange={(e) => onUpsertAttendance(selectedDate, member.id, targetType, status === 'Unmarked' ? 'Present' : status, e.target.value)}
                           placeholder="e.g. Health Leave, late bus"
-                          className="w-full bg-slate-50/50 hover:bg-slate-50 focus:bg-white text-[10.5px] font-mono text-slate-700 px-2.5 py-1 rounded-md border border-slate-100 focus:border-indigo-400 outline-hidden transition-all"
+                          className="w-full bg-[#111827] hover:bg-[#111827] focus:bg-[#1E293B] text-[10.5px] font-mono text-[#CBD5E1] px-2.5 py-1 rounded-md border border-[#334155] focus:border-indigo-400 outline-hidden transition-all"
                         />
                       </td>
                     </tr>
@@ -371,7 +517,7 @@ export const AttendanceManager: React.FC<AttendanceManagerProps> = ({
 
                 {displayedMembers.length === 0 && (
                   <tr>
-                    <td colSpan={3} className="p-10 text-center text-slate-400 text-xs">
+                    <td colSpan={3} className="p-10 text-center text-[#94A3B8] text-xs">
                       No matches located in filtered attendance list. Verify Class assignment or search query.
                     </td>
                   </tr>
@@ -400,7 +546,7 @@ export const AttendanceManager: React.FC<AttendanceManagerProps> = ({
             left: 0 !important;
             top: 0 !important;
             width: 100% !important;
-            border: 6px double #cca561 !important;
+            border: 6px double #38BDF8 !important;
             padding: 30px !important;
             margin: 0 !important;
             box-shadow: none !important;
@@ -424,20 +570,20 @@ export const AttendanceManager: React.FC<AttendanceManagerProps> = ({
       {/* 4. PREMIUM PRINT / SAVE AS PDF PREVIEW MODAL */}
       {isExportModalOpen && (
         <div className="fixed inset-0 z-50 overflow-y-auto flex items-center justify-center bg-slate-900/60 backdrop-blur-xs p-4 animate-fade-in" id="export-pdf-modal">
-          <div className="bg-[#faf6eb] border-2 border-[#ead2a3] rounded-3xl w-full max-w-4xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+          <div className="bg-[#1E293B] border-2 border-[#334155] rounded-3xl w-full max-w-4xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
             
             {/* Modal Control Header (Gold/Navy Royal Theme) */}
-            <div className="bg-gradient-to-r from-[#0d1b3e] to-[#070e24] p-5 text-white flex justify-between items-center border-b border-[#cca561] shrink-0">
+            <div className="bg-gradient-to-r from-[#111827] to-[#0B1120] p-5 text-white flex justify-between items-center border-b border-[#38BDF8] shrink-0">
               <div className="flex items-center gap-2.5">
-                <Crown className="w-5 h-5 text-[#dfbf85]" />
+                <Crown className="w-5 h-5 text-[#38BDF8]" />
                 <div className="text-left">
-                  <h3 className="font-display font-medium text-xs md:text-sm tracking-wider uppercase text-[#dfbf85]">Imperial Council Registry Export</h3>
-                  <p className="text-[10px] text-[#ead2a3]/80 italic font-serif">Configure cohort registry reports and materialize certified vector documents</p>
+                  <h3 className="font-sans font-medium text-xs md:text-sm tracking-wider uppercase text-[#38BDF8]">Imperial Council Registry Export</h3>
+                  <p className="text-[10px] text-[#38BDF8]/80  font-serif">Configure cohort registry reports and materialize certified vector documents</p>
                 </div>
               </div>
               <button 
                 onClick={() => setIsExportModalOpen(false)} 
-                className="p-1.5 hover:bg-white/10 rounded-full text-[#ead2a3] hover:text-white transition-colors cursor-pointer"
+                className="p-1.5 hover:bg-[#1E293B]/10 rounded-full text-[#38BDF8] hover:text-white transition-colors cursor-pointer"
                 title="Dismiss export chamber"
               >
                 <X className="w-5 h-5" />
@@ -448,15 +594,15 @@ export const AttendanceManager: React.FC<AttendanceManagerProps> = ({
             <div className="flex-1 overflow-y-auto p-5 md:p-8 space-y-6">
               
               {/* Configuration Inputs Section */}
-              <div className="bg-white p-5 rounded-3xl border border-[#ead2a3]/45 shadow-3xs grid grid-cols-1 md:grid-cols-2 gap-4" id="export-chamber-config">
+              <div className="bg-[#1E293B] p-5 rounded-3xl border border-[#334155]/45 shadow-3xs grid grid-cols-1 md:grid-cols-2 gap-4" id="export-chamber-config">
                 {/* Cohort input selection */}
                 <div className="space-y-1.5">
-                  <label className="block text-[10px] uppercase tracking-wider font-bold text-[#815e26] font-display">Target Class Academic Cohort</label>
+                  <label className="block text-[10px] uppercase tracking-wider font-bold text-white font-sans">Target Class Academic Cohort</label>
                   <select 
                     id="export-class-dropdown"
                     value={exportClass}
                     onChange={(e) => setExportClass(e.target.value)}
-                    className="w-full bg-[#faf6eb]/50 hover:bg-[#faf6eb] text-slate-800 text-xs font-bold font-display px-3 py-2.5 rounded-xl border border-[#ead2a3]/50 focus:border-[#b98d45] outline-hidden cursor-pointer shadow-3xs transition-colors"
+                    className="w-full bg-[#1E293B]/50 hover:bg-[#1E293B] text-white text-xs font-bold font-sans px-3 py-2.5 rounded-xl border border-[#334155]/50 focus:border-[#2563EB] outline-hidden cursor-pointer shadow-3xs transition-colors"
                   >
                     <option value="Class 10">Class 10 (Senior Tier-A)</option>
                     <option value="Class 9">Class 9 (Intermediate Tier-B)</option>
@@ -466,120 +612,120 @@ export const AttendanceManager: React.FC<AttendanceManagerProps> = ({
 
                 {/* Date input selection */}
                 <div className="space-y-1.5">
-                  <label className="block text-[10px] uppercase tracking-wider font-bold text-[#815e26] font-display">Logbook Record Calendar Date</label>
+                  <label className="block text-[10px] uppercase tracking-wider font-bold text-white font-sans">Logbook Record Calendar Date</label>
                   <input 
                     type="date"
                     id="export-date-picker"
                     value={exportDate}
                     onChange={(e) => setExportDate(e.target.value)}
-                    className="w-full bg-[#faf6eb]/50 hover:bg-[#faf6eb] text-slate-800 text-xs font-bold font-mono px-3 py-2 rounded-xl border border-[#ead2a3]/50 focus:border-[#b98d45] outline-hidden cursor-pointer shadow-3xs transition-colors"
+                    className="w-full bg-[#1E293B]/50 hover:bg-[#1E293B] text-white text-xs font-bold font-mono px-3 py-2 rounded-xl border border-[#334155]/50 focus:border-[#2563EB] outline-hidden cursor-pointer shadow-3xs transition-colors"
                   />
                 </div>
               </div>
 
               {/* Master Document Label */}
               <div className="flex justify-between items-center px-1">
-                <span className="text-[10px] font-bold text-[#815e26] uppercase tracking-[0.12em] font-display">Official Certified Registry Scroll Preview</span>
-                <span className="text-[10px] text-[#9e7534] italic font-serif">Changes propagate to the ledger scroll instantly</span>
+                <span className="text-[10px] font-bold text-white uppercase tracking-[0.12em] font-sans">Official Certified Registry Scroll Preview</span>
+                <span className="text-[10px] text-[#2563EB]  font-serif">Changes propagate to the ledger scroll instantly</span>
               </div>
 
               {/* IMMERSIVE SCROLL REGISTRY PREVIEW */}
               <div 
                 id="attendance-report-print-area" 
-                className="bg-white p-8 md:p-12 border-8 border-double border-[#cca561] shadow-md rounded-3xl relative overflow-hidden text-slate-900 font-sans mx-auto max-w-2xl bg-[radial-gradient(#faf6eb_1px,transparent_1px)] bg-[size:16px_16px]"
+                className="bg-[#1E293B] p-8 md:p-12 border-8 border-double border-[#38BDF8] shadow-md rounded-3xl relative overflow-hidden text-white font-sans mx-auto max-w-2xl bg-[radial-gradient(#1E293B_1px,transparent_1px)] bg-[size:16px_16px]"
               >
                 {/* Vintage Crest Background Accent */}
                 <div className="absolute inset-0 flex items-center justify-center opacity-[0.03] pointer-events-none select-none">
-                  <Crown className="w-80 h-80 text-[#b98d45]" />
+                  <Crown className="w-80 h-80 text-[#2563EB]" />
                 </div>
 
                 <div className="relative z-10 space-y-6">
                   {/* Ledger Header */}
-                  <div className="text-center space-y-1.5 pb-5 border-b-2 border-slate-100">
+                  <div className="text-center space-y-1.5 pb-5 border-b-2 border-[#334155]">
                     <div className="flex justify-center mb-1">
-                      <div className="p-2 border border-[#ead2a3] bg-[#faf6eb] rounded-full">
-                        <Crown className="w-6 h-6 text-[#b98d45]" />
+                      <div className="p-2 border border-[#334155] bg-[#1E293B] rounded-full">
+                        <Crown className="w-6 h-6 text-[#2563EB]" />
                       </div>
                     </div>
-                    <p className="text-[9px] uppercase tracking-[0.25em] font-bold font-display text-[#815e26]">THE CHANCELLOR’S IMPERIAL DECREE</p>
-                    <h2 className="text-lg md:text-xl font-black font-serif text-[#0d1b3e] tracking-wide uppercase">EDUQUBE IMPERIAL SEMINARY</h2>
+                    <p className="text-[9px] uppercase tracking-[0.25em] font-bold font-sans text-white">THE CHANCELLOR’S IMPERIAL DECREE</p>
+                    <h2 className="text-lg md:text-xl font-black font-serif text-[#111827] tracking-wide uppercase">EDUQUBE IMPERIAL SEMINARY</h2>
                     <p className="text-[9.5px] font-semibold text-slate-505 max-w-lg mx-auto tracking-wider uppercase">
                       Official Roll of Cohort Assembly Record & Royal Compliance Manifest
                     </p>
                   </div>
 
                   {/* Document Metadata Grid */}
-                  <div className="grid grid-cols-2 gap-4 text-[10px] py-3 border-b border-dashed border-[#ead2a3]/60 uppercase font-mono tracking-wider font-semibold">
+                  <div className="grid grid-cols-2 gap-4 text-[10px] py-3 border-b border-dashed border-[#334155]/60 uppercase font-mono tracking-wider font-semibold">
                     <div className="space-y-1 text-left">
-                      <p className="text-slate-400 text-[8.5px] lowercase italic">Academic Cohort Class:</p>
-                      <p className="text-[#815e26] font-bold font-display text-[11px] tracking-wide">{exportClass}</p>
+                      <p className="text-[#94A3B8] text-[8.5px] lowercase ">Academic Cohort Class:</p>
+                      <p className="text-white font-bold font-sans text-[11px] tracking-wide">{exportClass}</p>
                     </div>
                     <div className="space-y-1 text-left">
-                      <p className="text-slate-400 text-[8.5px] lowercase italic">Registry Logbook Date:</p>
-                      <p className="text-slate-800 font-bold text-[10.5px]">{exportDate ? prettifyDateRoyal(exportDate) : 'Not Specified'}</p>
+                      <p className="text-[#94A3B8] text-[8.5px] lowercase ">Registry Logbook Date:</p>
+                      <p className="text-white font-bold text-[10.5px]">{exportDate ? prettifyDateRoyal(exportDate) : 'Not Specified'}</p>
                     </div>
                     <div className="space-y-1 text-left">
-                      <p className="text-slate-400 text-[8.5px] lowercase italic">Chamber Officer Incharge:</p>
-                      <p className="text-slate-800 font-display text-[10.5px]">CHANCELLOR ADVISER</p>
+                      <p className="text-[#94A3B8] text-[8.5px] lowercase ">Chamber Officer Incharge:</p>
+                      <p className="text-white font-sans text-[10.5px]">CHANCELLOR ADVISER</p>
                     </div>
                     <div className="space-y-1 text-left">
-                      <p className="text-slate-400 text-[8.5px] lowercase italic">Verification Stamp Signum:</p>
-                      <p className="text-[#b98d45] font-semibold font-display text-[10.5px]">APPROVED ACADEMIC REGISTER</p>
+                      <p className="text-[#94A3B8] text-[8.5px] lowercase ">Verification Stamp Signum:</p>
+                      <p className="text-[#2563EB] font-semibold font-sans text-[10.5px]">APPROVED ACADEMIC REGISTER</p>
                     </div>
                   </div>
 
                   {/* Analytical Cohort Performance Summary Indicators */}
-                  <div className="bg-[#faf6eb]/75 p-4 rounded-2xl border border-[#ead2a3]/45 grid grid-cols-4 gap-2 text-center text-xs">
+                  <div className="bg-[#1E293B]/75 p-4 rounded-2xl border border-[#334155]/45 grid grid-cols-4 gap-2 text-center text-xs">
                     <div className="space-y-1">
-                      <p className="text-[8px] text-[#815e26] font-bold tracking-wider font-display uppercase">Cohort Roll</p>
-                      <p className="text-base font-black text-slate-800 font-mono">{totalInExport}</p>
+                      <p className="text-[8px] text-white font-bold tracking-wider font-sans uppercase">Cohort Roll</p>
+                      <p className="text-base font-black text-white font-mono">{totalInExport}</p>
                     </div>
-                    <div className="space-y-1 border-l border-[#ead2a3]/30">
-                      <p className="text-[8px] text-emerald-700 font-bold tracking-wider font-display uppercase">Present ✅</p>
-                      <p className="text-base font-black text-emerald-800 font-mono">{exportPresentCount}</p>
+                    <div className="space-y-1 border-l border-[#334155]/30">
+                      <p className="text-[8px] text-[#10B981] font-bold tracking-wider font-sans uppercase">Present ✅</p>
+                      <p className="text-base font-black text-[#10B981] font-mono">{exportPresentCount}</p>
                     </div>
-                    <div className="space-y-1 border-l border-[#ead2a3]/30">
-                      <p className="text-[8px] text-rose-600 font-bold tracking-wider font-display uppercase">Absent ❌</p>
-                      <p className="text-base font-black text-rose-800 font-mono">{exportAbsentCount}</p>
+                    <div className="space-y-1 border-l border-[#334155]/30">
+                      <p className="text-[8px] text-[#EF4444] font-bold tracking-wider font-sans uppercase">Absent ❌</p>
+                      <p className="text-base font-black text-[#EF4444] font-mono">{exportAbsentCount}</p>
                     </div>
-                    <div className="space-y-1 border-l border-[#ead2a3]/30 font-display">
-                      <p className="text-[8px] text-[#b98d45] font-bold tracking-wider uppercase">Compliance %</p>
-                      <p className="text-base font-black text-[#815e26] font-mono">{exportComplianceRate}%</p>
+                    <div className="space-y-1 border-l border-[#334155]/30 font-sans">
+                      <p className="text-[8px] text-[#2563EB] font-bold tracking-wider uppercase">Compliance %</p>
+                      <p className="text-base font-black text-white font-mono">{exportComplianceRate}%</p>
                     </div>
                   </div>
 
                   {/* High Quality Minimal Printable Ledger Grid */}
-                  <div className="border border-[#ead2a3]/40 rounded-xl overflow-hidden shadow-3xs">
+                  <div className="border border-[#334155]/40 rounded-xl overflow-hidden shadow-3xs">
                     <table className="w-full text-left border-collapse text-[10px] md:text-[11px]">
                       <thead>
-                        <tr className="bg-[#faf6eb]/60 border-b border-[#ead2a3]/30 text-[9px] text-[#815e26] font-display uppercase tracking-wider">
+                        <tr className="bg-[#1E293B]/60 border-b border-[#334155]/30 text-[9px] text-white font-sans uppercase tracking-wider">
                           <th className="p-2.5">Roll / Scholar Name</th>
                           <th className="p-2.5 text-center">Status Index</th>
                           <th className="p-2.5">Official Remarks Log</th>
                         </tr>
                       </thead>
-                      <tbody className="divide-y divide-slate-100 font-sans">
+                      <tbody className="divide-y divide-[#334155] font-sans">
                         {exportStudents.map((stud) => {
                           const sStatus = getExportStudentStatus(stud.id);
                           const sNotes = getExportStudentNotes(stud.id);
 
                           return (
-                            <tr key={stud.id} className="hover:bg-slate-50/50">
+                            <tr key={stud.id} className="hover:bg-[#111827]">
                               <td className="p-2.5 text-left">
-                                <p className="font-bold text-slate-800 text-[11px]">{stud.name}</p>
-                                <p className="text-[8.5px] text-slate-400 font-mono uppercase">Id: {stud.id} • Roll: {stud.rollNo}</p>
+                                <p className="font-bold text-white text-[11px]">{stud.name}</p>
+                                <p className="text-[8.5px] text-[#94A3B8] font-mono uppercase">Id: {stud.id} • Roll: {stud.rollNo}</p>
                               </td>
                               <td className="p-2.5 text-center">
-                                <span className={`inline-block px-2.5 py-0.5 rounded-full text-[8.5px] font-bold tracking-wide font-display ${
-                                  sStatus === 'Present' ? 'bg-emerald-50 text-emerald-850 border border-emerald-200' :
-                                  sStatus === 'Absent' ? 'bg-rose-50 text-rose-850 border border-rose-200' :
+                                <span className={`inline-block px-2.5 py-0.5 rounded-full text-[8.5px] font-bold tracking-wide font-sans ${
+                                  sStatus === 'Present' ? 'bg-[#10B981]/10 border border-[#10B981]/30 text-emerald-850 border border-emerald-200' :
+                                  sStatus === 'Absent' ? 'bg-[#EF4444]/10 border border-[#EF4444]/30 text-rose-850 border border-rose-200' :
                                   sStatus === 'Leave' ? 'bg-[#fffaeb] text-amber-850 border border-amber-200' :
-                                  'bg-slate-50 text-slate-400 border border-slate-200 border-dashed'
+                                  'bg-[#111827] text-[#94A3B8] border border-[#334155] border-dashed'
                                 }`}>
                                   {sStatus === 'Unmarked' ? 'UNMARKED' : sStatus.toUpperCase()}
                                 </span>
                               </td>
-                              <td className="p-2.5 italic text-slate-600 font-serif text-[10px] text-left">
+                              <td className="p-2.5  text-[#CBD5E1] font-serif text-[10px] text-left">
                                 {sNotes || <span className="text-slate-300 font-mono tracking-wider">—</span>}
                               </td>
                             </tr>
@@ -588,7 +734,7 @@ export const AttendanceManager: React.FC<AttendanceManagerProps> = ({
 
                         {exportStudents.length === 0 && (
                           <tr>
-                            <td colSpan={3} className="p-8 text-center text-slate-400 text-xs italic">
+                            <td colSpan={3} className="p-8 text-center text-[#94A3B8] text-xs ">
                               No active scholar matriculations found registered under {exportClass}.
                             </td>
                           </tr>
@@ -598,30 +744,30 @@ export const AttendanceManager: React.FC<AttendanceManagerProps> = ({
                   </div>
 
                   {/* Certified Authenticity seals, signatures, and monogram footer */}
-                  <div className="pt-6 border-t border-slate-150 space-y-5">
-                    <p className="text-[9px] italic text-[#815e26] text-center font-serif leading-relaxed px-4">
+                  <div className="pt-6 border-t border-[#334155] space-y-5">
+                    <p className="text-[9px]  text-white text-center font-serif leading-relaxed px-4">
                       "I hereby certify and warrant that this cohort registry record represents accurate attendance logs and compliance status under imperial council regulations."
                     </p>
 
                     {/* Signatures & Seal Split Layout */}
                     <div className="grid grid-cols-1 md:grid-cols-12 gap-5 items-center pt-2">
                       {/* Signature left */}
-                      <div className="md:col-span-5 text-center space-y-1 border-t border-slate-200 pt-1.5 font-display">
-                        <p className="text-[#815e26] font-serif text-sm italic font-semibold leading-none">A. K. Shastri</p>
-                        <p className="text-[8px] text-slate-400 tracking-wider uppercase font-semibold">Chancellor Dean of Seminary</p>
+                      <div className="md:col-span-5 text-center space-y-1 border-t border-[#334155] pt-1.5 font-sans">
+                        <p className="text-white font-serif text-sm  font-semibold leading-none">A. K. Shastri</p>
+                        <p className="text-[8px] text-[#94A3B8] tracking-wider uppercase font-semibold">Chancellor Dean of Seminary</p>
                       </div>
 
                       {/* Official seal image center */}
                       <div className="md:col-span-2 flex justify-center">
-                        <div className="relative w-11 h-11 flex items-center justify-center bg-gradient-to-br from-[#b98d45] to-[#815e26] rounded-full shadow-md text-white border-2 border-[#faf6eb] shrink-0 outline-2 outline-[#b98d45] outline-dashed">
+                        <div className="relative w-11 h-11 flex items-center justify-center bg-gradient-to-br from-[#2563EB] to-[#94A3B8] rounded-full shadow-md text-white border-2 border-[#1E293B] shrink-0 outline-2 outline-[#2563EB] outline-dashed">
                           <Crown className="w-4.5 h-4.5 animate-pulse" />
                         </div>
                       </div>
 
                       {/* Signature right */}
-                      <div className="md:col-span-5 text-center space-y-1 border-t border-slate-200 pt-1.5 font-display">
-                        <p className="text-slate-800 font-mono text-[10px] font-bold leading-none">VERIFIED LEDGER ENTRY</p>
-                        <p className="text-[8px] text-slate-400 tracking-wider uppercase font-semibold">Council Registrar Secretariat</p>
+                      <div className="md:col-span-5 text-center space-y-1 border-t border-[#334155] pt-1.5 font-sans">
+                        <p className="text-white font-mono text-[10px] font-bold leading-none">VERIFIED LEDGER ENTRY</p>
+                        <p className="text-[8px] text-[#94A3B8] tracking-wider uppercase font-semibold">Council Registrar Secretariat</p>
                       </div>
                     </div>
                   </div>
@@ -632,11 +778,11 @@ export const AttendanceManager: React.FC<AttendanceManagerProps> = ({
             </div>
 
             {/* Bottom Modal Controller Footer */}
-            <div className="bg-[#f5eedc] border-t border-[#ead2a3] p-4 flex flex-wrap gap-2.5 justify-end items-center shrink-0">
+            <div className="bg-[#1E293B] border-t border-[#334155] p-4 flex flex-wrap gap-2.5 justify-end items-center shrink-0">
               <button
                 type="button"
                 onClick={() => setIsExportModalOpen(false)}
-                className="px-4.5 py-2 bg-white hover:bg-[#faf6eb] border border-[#ead2a3]/65 text-[#815e26] font-display font-semibold rounded-xl text-xs cursor-pointer transition-all active:scale-95 shadow-3xs"
+                className="px-4.5 py-2 bg-[#1E293B] hover:bg-[#1E293B] border border-[#334155]/65 text-white font-sans font-semibold rounded-xl text-xs cursor-pointer transition-all active:scale-95 shadow-3xs"
               >
                 Cancel & Close Preview
               </button>
@@ -644,7 +790,7 @@ export const AttendanceManager: React.FC<AttendanceManagerProps> = ({
               <button
                 type="button"
                 onClick={() => window.print()}
-                className="flex items-center gap-1.5 px-6 py-2 bg-gradient-to-r from-[#9e7534] to-[#b98d45] hover:from-[#815e26] hover:to-[#9e7534] text-white font-display font-medium rounded-xl text-xs cursor-pointer transition-all shadow-sm active:scale-95"
+                className="flex items-center gap-1.5 px-6 py-2 bg-gradient-to-r from-[#2563EB] to-[#2563EB] hover:from-[#94A3B8] hover:to-[#2563EB] text-white font-sans font-medium rounded-xl text-xs cursor-pointer transition-all shadow-xl shadow-black/40 active:scale-95"
               >
                 <Printer className="w-4 h-4 text-white" />
                 <span>Print or Save PDF report</span>

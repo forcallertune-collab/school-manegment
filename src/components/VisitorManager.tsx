@@ -603,13 +603,13 @@ export const VisitorManager: React.FC<VisitorManagerProps> = ({
   return (
     <div className="space-y-6" id="visitor-module-container text-slate-705">
       {/* Title Header summary bar */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white p-6 rounded-2xl shadow-xs border border-slate-100">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-[#1E293B] p-6 rounded-2xl shadow-lg shadow-black/20 border border-[#334155]">
         <div>
-          <h1 className="text-xl font-bold text-slate-900 tracking-tight flex items-center gap-2">
-            <ClipboardList className="text-indigo-600 w-6 h-6" />
+          <h1 className="text-xl font-bold text-white tracking-tight flex items-center gap-2">
+            <ClipboardList className="text-[#2563EB] w-6 h-6" />
             Digital Visitor Log & Lobby Registry
           </h1>
-          <p className="text-sm text-slate-500 mt-0.5 font-sans">Streamline front-desk security check-ins, record visitor state purposes, and verify exit timestamps.</p>
+          <p className="text-sm text-[#94A3B8] mt-0.5 font-sans">Streamline front-desk security check-ins, record visitor state purposes, and verify exit timestamps.</p>
         </div>
 
         <div className="flex flex-wrap items-center gap-3 w-full sm:w-auto" id="lobby-audio-notifications-controls">
@@ -617,7 +617,7 @@ export const VisitorManager: React.FC<VisitorManagerProps> = ({
           <button
             type="button"
             onClick={() => setIsAudioMuted(!isAudioMuted)}
-            className={`p-2.5 rounded-xl border transition-all cursor-pointer flex items-center gap-1.5 text-xs font-semibold ${isAudioMuted ? 'bg-rose-50 border-rose-200 text-rose-600 hover:bg-rose-100' : 'bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100'}`}
+            className={`p-2.5 rounded-xl border transition-all cursor-pointer flex items-center gap-1.5 text-xs font-semibold ${isAudioMuted ? 'bg-[#EF4444]/10 border border-[#EF4444]/30 border-rose-200 text-[#EF4444] hover:bg-rose-100' : 'bg-[#111827] border-[#334155] text-[#CBD5E1] hover:bg-[#273549]'}`}
             title={isAudioMuted ? "Unmute reception arrival chime" : "Mute reception arrival chime"}
             id="btn-toggle-lobby-chime"
           >
@@ -632,10 +632,10 @@ export const VisitorManager: React.FC<VisitorManagerProps> = ({
               onClick={requestNotificationPermission}
               className={`p-2.5 rounded-xl border transition-all cursor-pointer flex items-center gap-1.5 text-xs font-semibold ${
                 notificationPermission === 'granted'
-                  ? 'bg-emerald-50 border-emerald-200 text-emerald-700 font-bold'
+                  ? 'bg-[#10B981]/10 border border-[#10B981]/30 border-emerald-200 text-[#10B981] font-bold'
                   : notificationPermission === 'denied'
-                  ? 'bg-amber-50 border-amber-200 text-amber-600'
-                  : 'bg-indigo-50 border-indigo-200 text-indigo-700 hover:bg-indigo-100 animate-pulse'
+                  ? 'bg-[#F59E0B]/10 border border-[#F59E0B]/30 border-amber-200 text-[#F59E0B]'
+                  : 'bg-[#2563EB]/10 border border-[#2563EB]/30 border-indigo-200 text-[#38BDF8] hover:bg-[#2563EB]/20 animate-pulse'
               }`}
               title="Click to toggle or request Desktop notifications"
               id="btn-toggle-desktop-alerts"
@@ -659,7 +659,7 @@ export const VisitorManager: React.FC<VisitorManagerProps> = ({
               setIsAutoFilledByHistory(false);
               setIsNewVisitorOpen(true);
             }}
-            className="flex items-center gap-2 px-4.5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-medium text-xs rounded-xl shadow-xs transition-all cursor-pointer"
+            className="flex items-center gap-2 px-4.5 py-2.5 bg-[#2563EB] shadow-[0_0_15px_rgba(37,99,235,0.3)] hover:shadow-[0_0_25px_rgba(56,189,248,0.5)] hover:bg-[#38BDF8] hover:bg-indigo-700 text-white font-medium text-xs rounded-xl shadow-lg shadow-black/20 transition-all cursor-pointer"
           >
             <Plus className="w-4 h-4" />
             Log Visitor Check-In
@@ -668,18 +668,18 @@ export const VisitorManager: React.FC<VisitorManagerProps> = ({
       </div>
 
       {/* Tab Segment Switches */}
-      <div className="flex bg-slate-100 p-1 rounded-xl w-full sm:w-fit" id="visitor-tab-switches">
+      <div className="flex bg-[#273549] p-1 rounded-xl w-full sm:w-fit" id="visitor-tab-switches">
         <button
           onClick={() => setActiveMainTab('logs')}
           id="tab-btn-visitor-logs"
-          className={`flex-1 sm:flex-initial text-xs font-bold px-4 py-2 rounded-lg cursor-pointer transition-all ${activeMainTab === 'logs' ? 'bg-white text-indigo-700 shadow-xs' : 'text-slate-500 hover:text-slate-800'}`}
+          className={`flex-1 sm:flex-initial text-xs font-bold px-4 py-2 rounded-lg cursor-pointer transition-all ${activeMainTab === 'logs' ? 'bg-[#1E293B] text-[#38BDF8] shadow-lg shadow-black/20' : 'text-[#94A3B8] hover:text-white'}`}
         >
           Active Lobby Logs
         </button>
         <button
           onClick={() => setActiveMainTab('history')}
           id="tab-btn-visitor-history"
-          className={`flex-1 sm:flex-initial text-xs font-bold px-4 py-2 rounded-lg cursor-pointer transition-all flex items-center justify-center gap-1.5 ${activeMainTab === 'history' ? 'bg-white text-indigo-700 shadow-xs' : 'text-slate-500 hover:text-slate-800'}`}
+          className={`flex-1 sm:flex-initial text-xs font-bold px-4 py-2 rounded-lg cursor-pointer transition-all flex items-center justify-center gap-1.5 ${activeMainTab === 'history' ? 'bg-[#1E293B] text-[#38BDF8] shadow-lg shadow-black/20' : 'text-[#94A3B8] hover:text-white'}`}
         >
           <Sparkles className="w-3.5 h-3.5 text-indigo-500" />
           Visitor History & Auto-Fill
@@ -689,16 +689,16 @@ export const VisitorManager: React.FC<VisitorManagerProps> = ({
       {activeMainTab === 'logs' ? (
         <>
           {/* Query filtration bar */}
-          <div className="bg-white p-5 rounded-2xl shadow-xs border border-slate-100 flex flex-col md:flex-row justify-between items-center gap-4 animate-fade-in" id="visitor-filters">
+          <div className="bg-[#1E293B] p-5 rounded-2xl shadow-lg shadow-black/20 border border-[#334155] flex flex-col md:flex-row justify-between items-center gap-4 animate-fade-in" id="visitor-filters">
             <div className="relative w-full md:w-96">
-              <Search className="absolute left-3 top-2.5 h-4 w-4 text-slate-400" />
+              <Search className="absolute left-3 top-2.5 h-4 w-4 text-[#94A3B8]" />
               <input 
                 type="text"
                 id="visitors-search-input"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search visitor logs by name or meeting purpose..."
-                className="w-full bg-slate-50 pl-10 pr-4 py-2 text-xs rounded-xl border border-slate-200 focus:bg-white outline-hidden focus:border-indigo-505 transition-all text-slate-700 font-medium"
+                className="w-full bg-[#111827] pl-10 pr-4 py-2 text-xs rounded-xl border border-[#334155] focus:bg-[#1E293B] outline-hidden focus:border-indigo-505 transition-all text-[#CBD5E1] font-medium"
               />
             </div>
             
@@ -716,11 +716,11 @@ export const VisitorManager: React.FC<VisitorManagerProps> = ({
                 }}
                 className={`flex gap-1.5 items-center px-3.5 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer border ${
                   isLobbyScannerOpen 
-                    ? 'bg-emerald-50 text-emerald-700 border-emerald-350 shadow-xs font-extrabold'
-                    : 'bg-slate-50 hover:bg-slate-100 text-slate-700 border-slate-200'
+                    ? 'bg-[#10B981]/10 border border-[#10B981]/30 text-[#10B981] border-emerald-350 shadow-lg shadow-black/20 font-extrabold'
+                    : 'bg-[#111827] hover:bg-[#273549] text-[#CBD5E1] border-[#334155]'
                 }`}
               >
-                <QrCode className={`w-4 h-4 ${isLobbyScannerOpen ? 'text-emerald-600 animate-pulse' : 'text-indigo-600'}`} />
+                <QrCode className={`w-4 h-4 ${isLobbyScannerOpen ? 'text-[#10B981] animate-pulse' : 'text-[#2563EB]'}`} />
                 <span>Touchless Check-Out Station</span>
               </button>
             </div>
@@ -743,7 +743,7 @@ export const VisitorManager: React.FC<VisitorManagerProps> = ({
               
               <div className="flex items-center justify-between border-b border-slate-800 pb-3">
                 <div className="flex items-center gap-2">
-                  <div className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></div>
+                  <div className="w-2.5 h-2.5 rounded-full bg-[#10B981]/10 border border-[#10B981]/300 animate-pulse"></div>
                   <div>
                     <h3 className="text-xs font-black uppercase tracking-widest text-emerald-400 font-mono">
                       Gate Guard Terminal: Touchless QR Check-Out Station
@@ -757,7 +757,7 @@ export const VisitorManager: React.FC<VisitorManagerProps> = ({
                     setIsLobbyScannerOpen(false);
                     stopLobbyScannerCamera();
                   }}
-                  className="p-1.5 hover:bg-slate-800 rounded-lg text-slate-400 hover:text-slate-100 transition-all cursor-pointer"
+                  className="p-1.5 hover:bg-slate-800 rounded-lg text-[#94A3B8] hover:text-slate-100 transition-all cursor-pointer"
                 >
                   <X className="w-4 h-4" />
                 </button>
@@ -765,7 +765,7 @@ export const VisitorManager: React.FC<VisitorManagerProps> = ({
 
               {/* Status scan successful toast flash */}
               {recentScannedVisitor && (
-                <div className="bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 p-3 rounded-xl text-xs font-sans font-bold flex items-center gap-2.5 animate-bounce">
+                <div className="bg-[#10B981]/10 border border-[#10B981]/300/10 border border-emerald-500/20 text-emerald-400 p-3 rounded-xl text-xs font-sans font-bold flex items-center gap-2.5 animate-bounce">
                   <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0 font-extrabold" />
                   <span>{recentScannedVisitor}</span>
                 </div>
@@ -777,7 +777,7 @@ export const VisitorManager: React.FC<VisitorManagerProps> = ({
                 <div className="lg:col-span-5 bg-slate-950 rounded-xl relative overflow-hidden h-48 border border-slate-800 flex flex-col items-center justify-center p-4">
                   
                   {/* Glowing Laser Scan beam line */}
-                  <div className="absolute top-0 left-0 right-0 h-0.5 bg-emerald-500 shadow-[0_0_8px_rgb(16,185,129)] animate-qr-laser z-10"></div>
+                  <div className="absolute top-0 left-0 right-0 h-0.5 bg-[#10B981]/10 border border-[#10B981]/300 shadow-[0_0_8px_rgb(16,185,129)] animate-qr-laser z-10"></div>
                   
                   {/* Decorative corner crosshair brackets */}
                   <div className="absolute top-3 left-3 w-4 h-4 border-t-2 border-l-2 border-slate-600"></div>
@@ -796,8 +796,8 @@ export const VisitorManager: React.FC<VisitorManagerProps> = ({
                   ) : (
                     <div className="text-center space-y-2 z-1">
                       <QrCode className="w-8 h-8 text-slate-650 mx-auto animate-pulse" />
-                      <p className="text-[11px] font-mono text-slate-400 uppercase tracking-widest font-black">Scanner Laser Active</p>
-                      <p className="text-[10px] text-slate-500 px-3">Webcam is off. Present any QR code below to register instant check-out.</p>
+                      <p className="text-[11px] font-mono text-[#94A3B8] uppercase tracking-widest font-black">Scanner Laser Active</p>
+                      <p className="text-[10px] text-[#94A3B8] px-3">Webcam is off. Present any QR code below to register instant check-out.</p>
                     </div>
                   )}
 
@@ -830,12 +830,12 @@ export const VisitorManager: React.FC<VisitorManagerProps> = ({
                 <div className="lg:col-span-7 space-y-4">
                   {/* Manual Keyboard entry or Scanner Barcode Gun trigger */}
                   <div className="space-y-1">
-                    <label className="block text-[10.5px] font-bold text-slate-400 uppercase tracking-wider font-mono">
+                    <label className="block text-[10.5px] font-bold text-[#94A3B8] uppercase tracking-wider font-mono">
                       USB Scanner Gun Emulation & Pass Identifier Entry
                     </label>
                     <div className="flex gap-2">
                       <div className="relative flex-grow">
-                        <Scan className="absolute left-3 top-2.5 h-3.5 w-3.5 text-slate-500" />
+                        <Scan className="absolute left-3 top-2.5 h-3.5 w-3.5 text-[#94A3B8]" />
                         <input
                           type="text"
                           value={manualBarcodeScan}
@@ -871,10 +871,10 @@ export const VisitorManager: React.FC<VisitorManagerProps> = ({
                   {/* Simulator Trigger tags */}
                   <div className="space-y-2 mr-2 text-left">
                     <div className="flex justify-between items-center border-b border-slate-800 pb-1">
-                      <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider font-mono">
+                      <span className="text-[10px] font-bold text-[#94A3B8] uppercase tracking-wider font-mono">
                         Quick Simulation: Fast-Touch Scanner Beam Tags
                       </span>
-                      <span className="text-[9.5px] text-slate-600 italic">Beeps on register!</span>
+                      <span className="text-[9.5px] text-[#CBD5E1] ">Beeps on register!</span>
                     </div>
 
                     <div className="flex flex-wrap gap-1.5 max-h-24 overflow-y-auto">
@@ -883,15 +883,15 @@ export const VisitorManager: React.FC<VisitorManagerProps> = ({
                           key={vis.id}
                           type="button"
                           onClick={() => handleScanCheckout(vis.id)}
-                          className="px-2.5 py-1.5 bg-slate-850 hover:bg-emerald-500/10 hover:border-emerald-500/30 hover:text-emerald-400 text-slate-300 rounded-lg text-[10.5px] font-bold transition-all border border-slate-800 cursor-pointer flex items-center gap-1.5 font-sans"
+                          className="px-2.5 py-1.5 bg-slate-850 hover:bg-[#10B981]/10 border border-[#10B981]/300/10 hover:border-emerald-500/30 hover:text-emerald-400 text-slate-300 rounded-lg text-[10.5px] font-bold transition-all border border-slate-800 cursor-pointer flex items-center gap-1.5 font-sans"
                         >
                           <QrCode className="w-3 h-3 text-emerald-500" />
                           <span>{vis.name}</span>
-                          <span className="bg-slate-900 px-1 py-0.5 rounded text-[8.5px] text-slate-500 font-mono">{vis.id}</span>
+                          <span className="bg-slate-900 px-1 py-0.5 rounded text-[8.5px] text-[#94A3B8] font-mono">{vis.id}</span>
                         </button>
                       ))}
                       {visitors.filter(v => !v.checkOut).length === 0 && (
-                        <p className="text-[10px] text-slate-500 italic pb-2">No active checked-in visitors currently inside school grounds.</p>
+                        <p className="text-[10px] text-[#94A3B8]  pb-2">No active checked-in visitors currently inside school grounds.</p>
                       )}
                     </div>
                   </div>
@@ -903,11 +903,11 @@ export const VisitorManager: React.FC<VisitorManagerProps> = ({
           )}
 
           {/* Main Visitor Table Card Grid */}
-          <div className="bg-white rounded-2xl border border-slate-100 overflow-hidden shadow-xs" id="visitors-table-card">
+          <div className="bg-[#1E293B] rounded-2xl border border-[#334155] overflow-hidden shadow-lg shadow-black/20" id="visitors-table-card">
             <div className="overflow-x-auto">
               <table className="w-full text-left border-collapse" id="visitors-reception-table">
                 <thead>
-                  <tr className="bg-slate-50 border-b border-slate-100 text-[10.5px] font-mono text-slate-505 uppercase tracking-wider italic">
+                  <tr className="bg-[#111827] border-b border-[#334155] text-[10.5px] font-mono text-slate-505 uppercase tracking-wider ">
                     <th className="p-4">Visitor Identification</th>
                     <th className="p-4">Phone contact</th>
                     <th className="p-4">Reason for visiting</th>
@@ -917,48 +917,48 @@ export const VisitorManager: React.FC<VisitorManagerProps> = ({
                     <th className="p-4 text-center">Desk Actions</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-50">
+                <tbody className="divide-y divide-[#334155]">
                   {filteredVisitors.map(vis => {
                     const isActive = !vis.checkOut;
                     
                     return (
-                      <tr key={vis.id} className="hover:bg-slate-50/50 transition-all text-xs" id={`visitor-row-${vis.id}`}>
+                      <tr key={vis.id} className="hover:bg-[#111827] transition-all text-xs" id={`visitor-row-${vis.id}`}>
                         {/* Visitor name */}
-                        <td className="p-4 font-bold text-slate-800">
+                        <td className="p-4 font-bold text-white">
                           <div className="flex items-center gap-2.5">
-                            <div className={`w-2 h-2 rounded-full ${isActive ? 'bg-emerald-500 animate-pulse' : 'bg-slate-300'}`}></div>
+                            <div className={`w-2 h-2 rounded-full ${isActive ? 'bg-[#10B981]/10 border border-[#10B981]/300 animate-pulse' : 'bg-slate-300'}`}></div>
                             <div>
-                              <p className="text-slate-850 font-bold">{vis.name}</p>
-                              <p className="text-[9.5px] text-slate-400 font-mono mt-0.5">ID: {vis.idProvided} • {vis.id}</p>
+                              <p className="text-white font-bold">{vis.name}</p>
+                              <p className="text-[9.5px] text-[#94A3B8] font-mono mt-0.5">ID: {vis.idProvided} • {vis.id}</p>
                             </div>
                           </div>
                         </td>
 
                         {/* Visitors Phone */}
-                        <td className="p-4 font-mono text-slate-600">
+                        <td className="p-4 font-mono text-[#CBD5E1]">
                           {vis.phone}
                         </td>
 
                         {/* Purpose */}
-                        <td className="p-4 text-slate-700">
+                        <td className="p-4 text-[#CBD5E1]">
                           <div>
                             <p className="font-medium text-slate-650">{vis.purpose}</p>
-                            <p className="text-[10px] text-slate-400 italic font-mono mt-0.5">Notes: "{vis.notes}"</p>
+                            <p className="text-[10px] text-[#94A3B8]  font-mono mt-0.5">Notes: "{vis.notes}"</p>
                           </div>
                         </td>
 
                         {/* Target official */}
                         <td className="p-4">
                           <div>
-                            <p className="font-semibold text-slate-700">{vis.hostName}</p>
-                            <p className="text-[10.5px] text-slate-405 italic font-sans">{vis.hostRole}</p>
+                            <p className="font-semibold text-[#CBD5E1]">{vis.hostName}</p>
+                            <p className="text-[10.5px] text-slate-405  font-sans">{vis.hostRole}</p>
                           </div>
                         </td>
 
                         {/* checkIn time */}
                         <td className="p-4">
-                          <div className="flex items-center gap-1.5 text-slate-600 font-mono text-[11px]">
-                            <Clock className="w-3.5 h-3.5 text-slate-400" />
+                          <div className="flex items-center gap-1.5 text-[#CBD5E1] font-mono text-[11px]">
+                            <Clock className="w-3.5 h-3.5 text-[#94A3B8]" />
                             <span>{vis.checkIn}</span>
                           </div>
                         </td>
@@ -966,11 +966,11 @@ export const VisitorManager: React.FC<VisitorManagerProps> = ({
                         {/* checkOut time */}
                         <td className="p-4">
                           {isActive ? (
-                            <span className="text-[10px] bg-emerald-50 text-emerald-800 border border-emerald-100 px-2 py-0.5 rounded-full font-bold">
+                            <span className="text-[10px] bg-[#10B981]/10 border border-[#10B981]/30 text-[#10B981] border border-emerald-100 px-2 py-0.5 rounded-full font-bold">
                               In Campus
                             </span>
                           ) : (
-                            <div className="flex items-center gap-1.5 text-slate-400 font-mono text-[11px]">
+                            <div className="flex items-center gap-1.5 text-[#94A3B8] font-mono text-[11px]">
                               <LogOut className="w-3.5 h-3.5" />
                               <span>{vis.checkOut}</span>
                             </div>
@@ -986,7 +986,7 @@ export const VisitorManager: React.FC<VisitorManagerProps> = ({
                                   type="button"
                                   id={`btn-gatepass-visitor-${vis.id}`}
                                   onClick={() => setSelectedPassVisitor(vis)}
-                                  className="flex items-center gap-1 px-3 py-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-bold rounded-lg border border-indigo-200 text-[10.5px] transition-all cursor-pointer"
+                                  className="flex items-center gap-1 px-3 py-1.5 bg-[#2563EB]/10 border border-[#2563EB]/30 hover:bg-[#2563EB]/20 text-[#38BDF8] font-bold rounded-lg border border-indigo-200 text-[10.5px] transition-all cursor-pointer"
                                   title="View and Print Digital QR Entry Pass"
                                 >
                                   <QrCode className="w-3.5 h-3.5" />
@@ -996,7 +996,7 @@ export const VisitorManager: React.FC<VisitorManagerProps> = ({
                                   type="button"
                                   id={`btn-checkout-visitor-${vis.id}`}
                                   onClick={() => handleCheckOut(vis.id)}
-                                  className="flex items-center gap-1 px-3 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-700 font-bold rounded-lg border border-rose-200 text-[10.5px] transition-all cursor-pointer"
+                                  className="flex items-center gap-1 px-3 py-1.5 bg-[#EF4444]/10 border border-[#EF4444]/30 hover:bg-rose-100 text-rose-700 font-bold rounded-lg border border-rose-200 text-[10.5px] transition-all cursor-pointer"
                                   title="Check-out visitor immediately"
                                 >
                                   <LogOut className="w-3.5 h-3.5 animate-pulse" />
@@ -1004,14 +1004,14 @@ export const VisitorManager: React.FC<VisitorManagerProps> = ({
                                 </button>
                               </>
                             ) : (
-                              <div className="flex flex-col items-center gap-1 text-[10px] text-slate-400 font-mono">
-                                <span className="flex items-center gap-1 font-bold text-slate-500 bg-slate-100 px-2 py-0.5 rounded">
-                                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" /> Signed Out
+                              <div className="flex flex-col items-center gap-1 text-[10px] text-[#94A3B8] font-mono">
+                                <span className="flex items-center gap-1 font-bold text-[#94A3B8] bg-[#273549] px-2 py-0.5 rounded">
+                                  <CheckCircle2 className="w-3.5 h-3.5 text-[#10B981]" /> Signed Out
                                 </span>
                                 <button
                                   type="button"
                                   onClick={() => setSelectedPassVisitor(vis)}
-                                  className="text-[9.5px] text-indigo-500 hover:text-indigo-700 underline font-sans font-semibold cursor-pointer"
+                                  className="text-[9.5px] text-indigo-500 hover:text-[#38BDF8] underline font-sans font-semibold cursor-pointer"
                                   title="View digital gate permit receipt"
                                 >
                                   View Receipt Pass
@@ -1026,7 +1026,7 @@ export const VisitorManager: React.FC<VisitorManagerProps> = ({
                   })}
                   {filteredVisitors.length === 0 && (
                     <tr>
-                      <td colSpan={7} className="p-10 text-center text-slate-404 italic text-xs">
+                      <td colSpan={7} className="p-10 text-center text-slate-404  text-xs">
                         No Visitor lobby recordings logged matching query metrics.
                       </td>
                     </tr>
@@ -1041,30 +1041,30 @@ export const VisitorManager: React.FC<VisitorManagerProps> = ({
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 animate-fade-in" id="visitor-history-tab-view">
           
           {/* LEFT TELEPHONY DIAL KEYPAD */}
-          <div className="lg:col-span-4 bg-white p-5 rounded-2xl border border-slate-100 shadow-xs flex flex-col justify-between space-y-6" id="keypad-lookup-panel">
+          <div className="lg:col-span-4 bg-[#1E293B] p-5 rounded-2xl border border-[#334155] shadow-lg shadow-black/20 flex flex-col justify-between space-y-6" id="keypad-lookup-panel">
             <div className="space-y-4">
               <div>
-                <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1 font-mono flex items-center gap-1">
+                <h3 className="text-xs font-bold text-[#94A3B8] uppercase tracking-wider mb-1 font-mono flex items-center gap-1">
                   <Phone className="w-3.5 h-3.5 text-indigo-500" /> LOOKUP INDEX
                 </h3>
-                <p className="text-xs text-slate-500 font-sans">Type direct customer phone digits or name prefixes to instantly isolate recurring profiles.</p>
+                <p className="text-xs text-[#94A3B8] font-sans">Type direct customer phone digits or name prefixes to instantly isolate recurring profiles.</p>
               </div>
 
               {/* Input for Phone/Name query */}
               <div className="relative">
-                <Search className="absolute left-3 top-3.5 h-4 w-4 text-slate-400" />
+                <Search className="absolute left-3 top-3.5 h-4 w-4 text-[#94A3B8]" />
                 <input
                   type="text"
                   id="history-phone-search-input"
                   value={historySearchPhone}
                   onChange={(e) => setHistorySearchPhone(e.target.value)}
                   placeholder="Type digits or full name..."
-                  className="w-full bg-slate-50 pl-10 pr-10 py-3 text-xs rounded-xl border border-slate-205 focus:bg-white outline-hidden focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/10 transition-all font-semibold font-mono text-slate-750 placeholder:font-sans placeholder:text-slate-400 placeholder:font-normal"
+                  className="w-full bg-[#111827] pl-10 pr-10 py-3 text-xs rounded-xl border border-slate-205 focus:bg-[#1E293B] outline-hidden focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/10 transition-all font-semibold font-mono text-slate-750 placeholder:font-sans placeholder:text-[#94A3B8] placeholder:font-normal"
                 />
                 {historySearchPhone && (
                   <button
                     onClick={() => setHistorySearchPhone('')}
-                    className="absolute right-3.5 top-3 hover:text-rose-600 text-slate-400 cursor-pointer p-0.5 bg-slate-200 hover:bg-slate-300 rounded-full"
+                    className="absolute right-3.5 top-3 hover:text-[#EF4444] text-[#94A3B8] cursor-pointer p-0.5 bg-[#334155] hover:bg-slate-300 rounded-full"
                     title="Clear search"
                   >
                     <X className="w-3 h-3" />
@@ -1073,15 +1073,15 @@ export const VisitorManager: React.FC<VisitorManagerProps> = ({
               </div>
 
               {/* Touchpad Dial Assist */}
-              <div className="bg-slate-50/70 p-4 rounded-xl border border-slate-100 space-y-3">
-                <p className="text-[10px] font-mono text-slate-400 font-bold uppercase tracking-wider text-center">Touch Screen Assist Pad</p>
+              <div className="bg-[#111827]/70 p-4 rounded-xl border border-[#334155] space-y-3">
+                <p className="text-[10px] font-mono text-[#94A3B8] font-bold uppercase tracking-wider text-center">Touch Screen Assist Pad</p>
                 <div className="grid grid-cols-3 gap-2">
                   {['1', '2', '3', '4', '5', '6', '7', '8', '9', '+', '0'].map((digit) => (
                     <button
                       key={digit}
                       type="button"
                       onClick={() => setHistorySearchPhone(p => p + digit)}
-                      className="py-3 text-xs font-bold bg-white active:bg-slate-250 hover:bg-indigo-50 hover:text-indigo-650 hover:border-indigo-200 text-slate-700 rounded-lg shadow-3xs cursor-pointer border border-slate-150 transition-all font-mono"
+                      className="py-3 text-xs font-bold bg-[#1E293B] active:bg-slate-250 hover:bg-[#2563EB]/10 border border-[#2563EB]/30 hover:text-indigo-650 hover:border-indigo-200 text-[#CBD5E1] rounded-lg shadow-3xs cursor-pointer border border-[#334155] transition-all font-mono"
                     >
                       {digit}
                     </button>
@@ -1089,7 +1089,7 @@ export const VisitorManager: React.FC<VisitorManagerProps> = ({
                   <button
                     type="button"
                     onClick={() => setHistorySearchPhone(p => p.slice(0, -1))}
-                    className="py-3 text-[10px] font-bold bg-slate-150 hover:bg-slate-200 text-slate-600 active:bg-slate-300 rounded-lg shadow-3xs cursor-pointer border border-slate-200/50 transition-all"
+                    className="py-3 text-[10px] font-bold bg-slate-150 hover:bg-[#334155] text-[#CBD5E1] active:bg-slate-300 rounded-lg shadow-3xs cursor-pointer border border-[#334155]/50 transition-all"
                   >
                     ⌫ Back
                   </button>
@@ -1097,27 +1097,27 @@ export const VisitorManager: React.FC<VisitorManagerProps> = ({
                 <button
                   type="button"
                   onClick={() => setHistorySearchPhone('')}
-                  className="w-full py-2 text-[10px] font-bold bg-rose-50 hover:bg-rose-100/80 text-rose-700 active:bg-rose-200 rounded-lg shadow-3xs cursor-pointer transition-all border border-rose-100"
+                  className="w-full py-2 text-[10px] font-bold bg-[#EF4444]/10 border border-[#EF4444]/30 hover:bg-rose-100/80 text-rose-700 active:bg-rose-200 rounded-lg shadow-3xs cursor-pointer transition-all border border-rose-100"
                 >
                   Clear Lookup Input
                 </button>
               </div>
             </div>
 
-            <div className="pt-4 border-t border-slate-100 text-[10px] text-slate-400 leading-relaxed space-y-1 font-sans">
-              <span className="font-semibold block text-slate-500 font-mono">RECURRING PROFILE ENGINE:</span>
+            <div className="pt-4 border-t border-[#334155] text-[10px] text-[#94A3B8] leading-relaxed space-y-1 font-sans">
+              <span className="font-semibold block text-[#94A3B8] font-mono">RECURRING PROFILE ENGINE:</span>
               <span>Our system maps historic lobby registers locally. Searching indices permits instantly auto-populating fields, increasing speed by up to 80%.</span>
             </div>
           </div>
 
           {/* RIGHT RECURRING MATCH RESULTS */}
-          <div className="lg:col-span-8 bg-white p-5 rounded-2xl border border-slate-100 shadow-xs space-y-4" id="recurring-matches-panel">
-            <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+          <div className="lg:col-span-8 bg-[#1E293B] p-5 rounded-2xl border border-[#334155] shadow-lg shadow-black/20 space-y-4" id="recurring-matches-panel">
+            <div className="flex items-center justify-between pb-3 border-b border-[#334155]">
               <div>
                 <h3 className="text-xs font-bold text-slate-405 uppercase tracking-wider mb-0.5">
                   Matched Recurring Profiles ({filteredHistory.length})
                 </h3>
-                <p className="text-xs text-slate-500 font-sans">Select any past visitor profile to trigger secure check-in auto-fill.</p>
+                <p className="text-xs text-[#94A3B8] font-sans">Select any past visitor profile to trigger secure check-in auto-fill.</p>
               </div>
               
               <button
@@ -1127,7 +1127,7 @@ export const VisitorManager: React.FC<VisitorManagerProps> = ({
                   setIsAutoFilledByHistory(false);
                   setIsNewVisitorOpen(true);
                 }}
-                className="px-3 py-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-750 text-xs font-bold rounded-xl flex items-center gap-1.5 cursor-pointer transition-all border border-indigo-200/40"
+                className="px-3 py-1.5 bg-[#2563EB]/10 border border-[#2563EB]/30 hover:bg-[#2563EB]/20 text-indigo-750 text-xs font-bold rounded-xl flex items-center gap-1.5 cursor-pointer transition-all border border-indigo-200/40"
               >
                 <Plus className="w-3.5 h-3.5" />
                 Register New Visitor
@@ -1137,9 +1137,9 @@ export const VisitorManager: React.FC<VisitorManagerProps> = ({
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-h-[520px] overflow-y-auto pr-1">
               {filteredHistory.map((vis, pIdx) => {
                 const bgColors = [
-                  'bg-indigo-50 text-indigo-700 border-indigo-100',
-                  'bg-emerald-50 text-emerald-700 border-emerald-100',
-                  'bg-amber-50 text-amber-500 border-amber-100',
+                  'bg-[#2563EB]/10 border border-[#2563EB]/30 text-[#38BDF8] border-indigo-100',
+                  'bg-[#10B981]/10 border border-[#10B981]/30 text-[#10B981] border-emerald-100',
+                  'bg-[#F59E0B]/10 border border-[#F59E0B]/30 text-amber-500 border-amber-100',
                   'bg-cyan-50 text-cyan-705 border-cyan-100',
                   'bg-fuchsia-50 text-fuchsia-700 border-fuchsia-100'
                 ];
@@ -1150,7 +1150,7 @@ export const VisitorManager: React.FC<VisitorManagerProps> = ({
                   <div
                     key={`${vis.phone}-${pIdx}`}
                     id={`profile-card-${vis.phone}`}
-                    className="p-4 border border-slate-100 rounded-xl hover:border-indigo-300 bg-slate-50/25 hover:bg-white hover:shadow-xs transition-all flex flex-col justify-between space-y-3 group"
+                    className="p-4 border border-[#334155] rounded-xl hover:border-indigo-300 bg-[#111827]/25 hover:bg-[#1E293B] hover:shadow-lg shadow-black/20 transition-all flex flex-col justify-between space-y-3 group"
                   >
                     <div className="flex items-start gap-3">
                       <div className={`w-10 h-10 rounded-xl flex items-center justify-center font-bold font-mono text-xs border shrink-0 ${activeColor}`}>
@@ -1159,21 +1159,21 @@ export const VisitorManager: React.FC<VisitorManagerProps> = ({
 
                       <div className="space-y-1 flex-1 min-w-0">
                         <div className="flex items-center gap-2 flex-wrap">
-                          <h4 className="font-bold text-slate-800 group-hover:text-indigo-700 transition-colors text-xs truncate max-w-full">{vis.name}</h4>
-                          <span className="px-1.5 py-0.5 text-[9px] font-bold bg-indigo-50 text-indigo-600 rounded-md shrink-0">
+                          <h4 className="font-bold text-white group-hover:text-[#38BDF8] transition-colors text-xs truncate max-w-full">{vis.name}</h4>
+                          <span className="px-1.5 py-0.5 text-[9px] font-bold bg-[#2563EB]/10 border border-[#2563EB]/30 text-[#2563EB] rounded-md shrink-0">
                             {vis.totalVisits} {vis.totalVisits === 1 ? 'visit' : 'visits'}
                           </span>
                         </div>
-                        <p className="text-[11px] font-mono font-medium text-slate-500">{vis.phone}</p>
-                        <p className="text-[10px] text-slate-400 truncate">
-                          ID: <span className="font-semibold text-slate-600">{vis.idProvided}</span>
+                        <p className="text-[11px] font-mono font-medium text-[#94A3B8]">{vis.phone}</p>
+                        <p className="text-[10px] text-[#94A3B8] truncate">
+                          ID: <span className="font-semibold text-[#CBD5E1]">{vis.idProvided}</span>
                         </p>
                       </div>
                     </div>
 
-                    <div className="pt-2 border-t border-slate-100/60 flex items-center justify-between text-[10px]">
-                      <span className="text-slate-400 font-sans">
-                        Last Active: <span className="font-medium text-slate-500">{vis.lastVisited}</span>
+                    <div className="pt-2 border-t border-[#334155]/60 flex items-center justify-between text-[10px]">
+                      <span className="text-[#94A3B8] font-sans">
+                        Last Active: <span className="font-medium text-[#94A3B8]">{vis.lastVisited}</span>
                       </span>
 
                       <button
@@ -1186,7 +1186,7 @@ export const VisitorManager: React.FC<VisitorManagerProps> = ({
                           setIsAutoFilledByHistory(true);
                           setIsNewVisitorOpen(true);
                         }}
-                        className="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-lg cursor-pointer transition-all flex items-center gap-1 shrink-0"
+                        className="px-3 py-1.5 bg-[#2563EB] shadow-[0_0_15px_rgba(37,99,235,0.3)] hover:shadow-[0_0_25px_rgba(56,189,248,0.5)] hover:bg-[#38BDF8] hover:bg-indigo-700 text-white font-bold rounded-lg cursor-pointer transition-all flex items-center gap-1 shrink-0"
                       >
                         <Sparkles className="w-3 h-3 text-indigo-200" />
                         Auto-fill Profile
@@ -1197,9 +1197,9 @@ export const VisitorManager: React.FC<VisitorManagerProps> = ({
               })}
 
               {filteredHistory.length === 0 && (
-                <div className="col-span-1 md:col-span-2 p-10 text-center rounded-xl border border-dashed border-slate-205 bg-slate-50/50 space-y-3">
-                  <p className="text-xs text-slate-505 italic font-medium">No recurring profile matches your lookup.</p>
-                  <p className="text-[10.5px] text-slate-400">Search with another contact number digits index or name, or register a new face check-in from scratch.</p>
+                <div className="col-span-1 md:col-span-2 p-10 text-center rounded-xl border border-dashed border-slate-205 bg-[#111827] space-y-3">
+                  <p className="text-xs text-slate-505  font-medium">No recurring profile matches your lookup.</p>
+                  <p className="text-[10.5px] text-[#94A3B8]">Search with another contact number digits index or name, or register a new face check-in from scratch.</p>
                   <button
                     onClick={() => {
                       setFormName('');
@@ -1207,7 +1207,7 @@ export const VisitorManager: React.FC<VisitorManagerProps> = ({
                       setIsAutoFilledByHistory(false);
                       setIsNewVisitorOpen(true);
                     }}
-                    className="inline-block px-4 py-1.5 bg-white border border-slate-200 text-indigo-600 hover:text-white hover:bg-indigo-650 rounded-xl text-xs font-bold cursor-pointer transition-all shadow-3xs"
+                    className="inline-block px-4 py-1.5 bg-[#1E293B] border border-[#334155] text-[#2563EB] hover:text-white hover:bg-indigo-650 rounded-xl text-xs font-bold cursor-pointer transition-all shadow-3xs"
                   >
                     Register Brand New Visitor
                   </button>
@@ -1221,15 +1221,15 @@ export const VisitorManager: React.FC<VisitorManagerProps> = ({
       {/* OVERLAY VISITOR: LOBBY CHECKIN REGISTER FORM */}
       {isNewVisitorOpen && (
         <div className="fixed inset-0 z-55 bg-slate-905/40 backdrop-blur-xs flex items-center justify-center p-4" id="visitor-creation-modal">
-          <div className={`bg-white rounded-2xl w-full ${isScanPanelOpen ? 'max-w-3xl' : 'max-w-md'} shadow-2xl border border-slate-100 flex flex-col transition-all duration-300`}>
+          <div className={`bg-[#1E293B] rounded-2xl w-full ${isScanPanelOpen ? 'max-w-3xl' : 'max-w-md'} shadow-2xl border border-[#334155] flex flex-col transition-all duration-300`}>
             
-            <div className="p-5 border-b border-slate-100 bg-slate-50/50 rounded-t-2xl flex items-center justify-between">
+            <div className="p-5 border-b border-[#334155] bg-[#111827] rounded-t-2xl flex items-center justify-between">
               <div>
-                <h3 className="text-sm font-bold text-slate-800 flex items-center gap-2">
+                <h3 className="text-sm font-bold text-white flex items-center gap-2">
                   <Sparkles className="w-4 h-4 text-indigo-500" />
                   Register Lobby Visitor
                 </h3>
-                <p className="text-xs text-slate-400 mt-1 font-sans">Acquire details for ID badge printouts.</p>
+                <p className="text-xs text-[#94A3B8] mt-1 font-sans">Acquire details for ID badge printouts.</p>
               </div>
               {!isScanPanelOpen && (
                 <button
@@ -1240,7 +1240,7 @@ export const VisitorManager: React.FC<VisitorManagerProps> = ({
                     setActiveScanTab('camera');
                     startCamera();
                   }}
-                  className="px-3 py-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-600 hover:text-indigo-700 text-xs font-bold rounded-lg border border-indigo-200/50 transition-all flex items-center gap-1 cursor-pointer"
+                  className="px-3 py-1.5 bg-[#2563EB]/10 border border-[#2563EB]/30 hover:bg-[#2563EB]/20 text-[#2563EB] hover:text-[#38BDF8] text-xs font-bold rounded-lg border border-indigo-200/50 transition-all flex items-center gap-1 cursor-pointer"
                 >
                   <Camera className="w-3.5 h-3.5 animate-pulse" />
                   Smart Scan ID
@@ -1249,12 +1249,12 @@ export const VisitorManager: React.FC<VisitorManagerProps> = ({
             </div>
 
             {isAutoFilledByHistory && (
-              <div className="bg-emerald-50 border-b border-emerald-100 px-5 py-3 text-xs text-emerald-800 flex items-start justify-between gap-3 animate-fade-in">
+              <div className="bg-[#10B981]/10 border border-[#10B981]/30 border-b border-emerald-100 px-5 py-3 text-xs text-[#10B981] flex items-start justify-between gap-3 animate-fade-in">
                 <div className="flex items-center gap-2">
-                  <Check className="w-4 h-4 text-emerald-600 shrink-0 font-extrabold" />
+                  <Check className="w-4 h-4 text-[#10B981] shrink-0 font-extrabold" />
                   <div>
-                    <span className="font-bold block text-emerald-800 font-sans">Recurring visitor profile auto-filled</span>
-                    <span className="text-[10.5px] text-emerald-600 block mt-0.5">Loaded name, mobile, and primary credentials from past history register.</span>
+                    <span className="font-bold block text-[#10B981] font-sans">Recurring visitor profile auto-filled</span>
+                    <span className="text-[10.5px] text-[#10B981] block mt-0.5">Loaded name, mobile, and primary credentials from past history register.</span>
                   </div>
                 </div>
                 <button
@@ -1264,26 +1264,26 @@ export const VisitorManager: React.FC<VisitorManagerProps> = ({
                     setFormPhone('');
                     setIsAutoFilledByHistory(false);
                   }}
-                  className="text-[10px] text-emerald-700 hover:text-emerald-900 underline font-sans font-bold cursor-pointer shrink-0"
+                  className="text-[10px] text-[#10B981] hover:text-emerald-900 underline font-sans font-bold cursor-pointer shrink-0"
                 >
                   Clear Fields
                 </button>
               </div>
             )}
 
-            <div className="flex flex-col md:flex-row divide-y md:divide-y-0 md:divide-x divide-slate-100">
+            <div className="flex flex-col md:flex-row divide-y md:divide-y-0 md:divide-x divide-[#334155]">
               
               {/* LEFT HALF DESIGN: CAMERA SCANNER INTERFACE */}
               {isScanPanelOpen && (
-                <div className="w-full md:w-1/2 p-5 bg-slate-50/70 flex flex-col justify-between" id="ai-id-scanner-panel">
+                <div className="w-full md:w-1/2 p-5 bg-[#111827]/70 flex flex-col justify-between" id="ai-id-scanner-panel">
                   <div className="space-y-4">
                     <div className="flex items-center justify-between">
                       <h4 className="text-xs font-black uppercase tracking-wider text-slate-650 flex items-center gap-1.5 font-mono">
-                        <Sparkles className="w-3.5 h-3.5 text-indigo-600" />
+                        <Sparkles className="w-3.5 h-3.5 text-[#2563EB]" />
                         AI ID Document scanner
                       </h4>
                       
-                      <div className="flex items-center gap-1 bg-white border border-slate-200 rounded-lg p-0.5 shadow-3xs" id="scanner-tabs">
+                      <div className="flex items-center gap-1 bg-[#1E293B] border border-[#334155] rounded-lg p-0.5 shadow-3xs" id="scanner-tabs">
                         <button
                           type="button"
                           onClick={() => {
@@ -1291,7 +1291,7 @@ export const VisitorManager: React.FC<VisitorManagerProps> = ({
                             startCamera();
                           }}
                           className={`px-2.5 py-1 text-[10.5px] font-bold rounded-md transition-all cursor-pointer ${
-                            activeScanTab === 'camera' ? 'bg-indigo-600 text-white shadow-3xs' : 'text-slate-500 hover:text-slate-850'
+                            activeScanTab === 'camera' ? 'bg-[#2563EB] shadow-[0_0_15px_rgba(37,99,235,0.3)] hover:shadow-[0_0_25px_rgba(56,189,248,0.5)] hover:bg-[#38BDF8] text-white shadow-3xs' : 'text-[#94A3B8] hover:text-white'
                           }`}
                         >
                           Camera
@@ -1303,7 +1303,7 @@ export const VisitorManager: React.FC<VisitorManagerProps> = ({
                             stopCamera();
                           }}
                           className={`px-2.5 py-1 text-[10.5px] font-bold rounded-md transition-all cursor-pointer ${
-                            activeScanTab === 'upload' ? 'bg-indigo-600 text-white shadow-3xs' : 'text-slate-500 hover:text-slate-850'
+                            activeScanTab === 'upload' ? 'bg-[#2563EB] shadow-[0_0_15px_rgba(37,99,235,0.3)] hover:shadow-[0_0_25px_rgba(56,189,248,0.5)] hover:bg-[#38BDF8] text-white shadow-3xs' : 'text-[#94A3B8] hover:text-white'
                           }`}
                         >
                           Upload File
@@ -1315,8 +1315,8 @@ export const VisitorManager: React.FC<VisitorManagerProps> = ({
                       <div className="space-y-3">
                         {/* CAMERA LIST SELECTOR FOR SWITCHING FRONT/REAR */}
                         {videoDevices.length > 1 && (
-                          <div className="flex items-center gap-1.5 text-[11px] text-slate-500 font-sans">
-                            <RotateCw className="w-3 h-3 text-slate-400 rotate-180" />
+                          <div className="flex items-center gap-1.5 text-[11px] text-[#94A3B8] font-sans">
+                            <RotateCw className="w-3 h-3 text-[#94A3B8] rotate-180" />
                             <span>Switch Source:</span>
                             <select
                               value={selectedDeviceId}
@@ -1324,7 +1324,7 @@ export const VisitorManager: React.FC<VisitorManagerProps> = ({
                                 setSelectedDeviceId(e.target.value);
                                 startCamera(e.target.value);
                               }}
-                              className="bg-white border border-slate-205 rounded-md px-2 py-0.5 focus:outline-hidden text-[10.5px] font-medium text-slate-600"
+                              className="bg-[#1E293B] border border-slate-205 rounded-md px-2 py-0.5 focus:outline-hidden text-[10.5px] font-medium text-[#CBD5E1]"
                             >
                               {videoDevices.map((dev, dIdx) => (
                                 <option key={dev.deviceId} value={dev.deviceId}>
@@ -1336,7 +1336,7 @@ export const VisitorManager: React.FC<VisitorManagerProps> = ({
                         )}
 
                         {/* LIVE WEBCAM TARGET FRAME */}
-                        <div className="relative aspect-video rounded-xl overflow-hidden bg-slate-900 border border-slate-200/85 shadow-md flex items-center justify-center">
+                        <div className="relative aspect-video rounded-xl overflow-hidden bg-slate-900 border border-[#334155]/85 shadow-md flex items-center justify-center">
                           {isScannerActive ? (
                             <>
                               <video
@@ -1349,34 +1349,34 @@ export const VisitorManager: React.FC<VisitorManagerProps> = ({
 
                               {/* DASHED DOCUMENT FOCUS GUIDE */}
                               <div className="absolute inset-4 border-2 border-dashed border-indigo-400/50 rounded-lg pointer-events-none flex items-center justify-center bg-transparent">
-                                <div className="text-[9.5px] font-black uppercase tracking-wider px-2 py-0.5 bg-slate-900/80 backdrop-blur-xs text-indigo-200 rounded-md mt-16 font-mono text-center shadow-sm">
+                                <div className="text-[9.5px] font-black uppercase tracking-wider px-2 py-0.5 bg-slate-900/80 backdrop-blur-xs text-indigo-200 rounded-md mt-16 font-mono text-center shadow-xl shadow-black/40">
                                   Position ID Card
                                 </div>
                               </div>
 
                               {/* LASER LINE ANIMATION */}
                               <div className="absolute inset-0 pointer-events-none overflow-hidden rounded-xl">
-                                <div className="absolute left-0 w-full h-0.5 bg-indigo-500 opacity-90 shadow-[0_0_8px_#3b82f6] animate-scan-line"></div>
+                                <div className="absolute left-0 w-full h-0.5 bg-[#2563EB]/10 border border-[#2563EB]/300 opacity-90 shadow-[0_0_8px_#3b82f6] animate-scan-line"></div>
                               </div>
 
                               {/* LIVE CORNER GLOW */}
-                              <div className="absolute top-2.5 right-2.5 text-[9px] font-mono bg-emerald-500 text-white px-2 py-0.5 rounded-full font-bold uppercase tracking-wider flex items-center gap-1">
-                                <span className="w-1.5 h-1.5 bg-white rounded-full animate-ping"></span> Webcam Online
+                              <div className="absolute top-2.5 right-2.5 text-[9px] font-mono bg-[#10B981]/10 border border-[#10B981]/300 text-white px-2 py-0.5 rounded-full font-bold uppercase tracking-wider flex items-center gap-1">
+                                <span className="w-1.5 h-1.5 bg-[#1E293B] rounded-full animate-ping"></span> Webcam Online
                               </div>
                             </>
                           ) : (
                             <div className="p-5 text-center space-y-3 bg-slate-950/95 w-full h-full flex flex-col justify-center items-center">
-                              <div className="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center text-slate-400 border border-slate-700">
+                              <div className="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center text-[#94A3B8] border border-slate-700">
                                 <Camera className="w-5 h-5" />
                               </div>
                               <div>
                                 <p className="text-[11px] font-bold text-slate-200">Device Video Offline</p>
-                                <p className="text-[9.5px] text-slate-400 max-w-[200px] mt-0.5 mx-auto leading-relaxed">Please grant camera hardware frame authorizations to activate.</p>
+                                <p className="text-[9.5px] text-[#94A3B8] max-w-[200px] mt-0.5 mx-auto leading-relaxed">Please grant camera hardware frame authorizations to activate.</p>
                               </div>
                               <button
                                 type="button"
                                 onClick={() => startCamera()}
-                                className="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white text-[10.5px] rounded-lg shadow-sm font-bold transition-all cursor-pointer"
+                                className="px-3 py-1.5 bg-[#2563EB] shadow-[0_0_15px_rgba(37,99,235,0.3)] hover:shadow-[0_0_25px_rgba(56,189,248,0.5)] hover:bg-[#38BDF8] hover:bg-indigo-700 text-white text-[10.5px] rounded-lg shadow-xl shadow-black/40 font-bold transition-all cursor-pointer"
                               >
                                 Activate Webcam
                               </button>
@@ -1391,7 +1391,7 @@ export const VisitorManager: React.FC<VisitorManagerProps> = ({
                               type="button"
                               disabled={isAnalyzing}
                               onClick={handleCaptureScan}
-                              className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 disabled:bg-indigo-750 text-white rounded-xl text-[11px] font-bold shadow-xs flex items-center gap-1.5 transition-all cursor-pointer"
+                              className="px-4 py-2 bg-[#2563EB] shadow-[0_0_15px_rgba(37,99,235,0.3)] hover:shadow-[0_0_25px_rgba(56,189,248,0.5)] hover:bg-[#38BDF8] hover:bg-indigo-700 disabled:bg-indigo-750 text-white rounded-xl text-[11px] font-bold shadow-lg shadow-black/20 flex items-center gap-1.5 transition-all cursor-pointer"
                             >
                               {isAnalyzing ? (
                                 <>
@@ -1408,7 +1408,7 @@ export const VisitorManager: React.FC<VisitorManagerProps> = ({
                             <button
                               type="button"
                               onClick={stopCamera}
-                              className="px-3 py-2 bg-slate-200 hover:bg-slate-300 text-slate-600 rounded-xl text-[11px] font-bold transition-all cursor-pointer"
+                              className="px-3 py-2 bg-[#334155] hover:bg-slate-300 text-[#CBD5E1] rounded-xl text-[11px] font-bold transition-all cursor-pointer"
                             >
                               Stop Feed
                             </button>
@@ -1424,7 +1424,7 @@ export const VisitorManager: React.FC<VisitorManagerProps> = ({
                           onDrop={handleDrop}
                           onClick={() => fileInputRef.current?.click()}
                           className={`border-2 border-dashed rounded-xl p-5 text-center transition-all cursor-pointer flex flex-col items-center justify-center aspect-video ${
-                            dragActive ? 'border-indigo-500 bg-indigo-50/40' : 'border-slate-200 hover:border-indigo-400 hover:bg-slate-50'
+                            dragActive ? 'border-indigo-500 bg-[#2563EB]/10 border border-[#2563EB]/30/40' : 'border-[#334155] hover:border-indigo-400 hover:bg-[#111827]'
                           }`}
                         >
                           <input
@@ -1436,20 +1436,20 @@ export const VisitorManager: React.FC<VisitorManagerProps> = ({
                           />
                           {isAnalyzing ? (
                             <div className="space-y-2">
-                              <RefreshCw className="w-7 h-7 text-indigo-600 animate-spin mx-auto" />
-                              <p className="text-[11px] font-bold text-slate-800">Processing image via Gemini Vision...</p>
-                              <p className="text-[9.5px] text-slate-400">Extracting visitor full names and document matches.</p>
+                              <RefreshCw className="w-7 h-7 text-[#2563EB] animate-spin mx-auto" />
+                              <p className="text-[11px] font-bold text-white">Processing image via Gemini Vision...</p>
+                              <p className="text-[9.5px] text-[#94A3B8]">Extracting visitor full names and document matches.</p>
                             </div>
                           ) : (
                             <div className="space-y-2">
-                              <div className="w-9 h-9 rounded-full bg-slate-100 flex items-center justify-center mx-auto text-slate-400">
+                              <div className="w-9 h-9 rounded-full bg-[#273549] flex items-center justify-center mx-auto text-[#94A3B8]">
                                 <Upload className="w-4 h-4" />
                               </div>
                               <div>
-                                <p className="text-[11px] font-bold text-slate-700">Drag & Drop ID Card Image</p>
-                                <p className="text-[9.5px] text-slate-400 mt-0.5">Supports barcode credentials or physical badges</p>
+                                <p className="text-[11px] font-bold text-[#CBD5E1]">Drag & Drop ID Card Image</p>
+                                <p className="text-[9.5px] text-[#94A3B8] mt-0.5">Supports barcode credentials or physical badges</p>
                               </div>
-                              <span className="inline-block text-[10px] text-indigo-600 font-semibold bg-indigo-50 border border-indigo-100 px-2.5 py-0.5 rounded-lg">
+                              <span className="inline-block text-[10px] text-[#2563EB] font-semibold bg-[#2563EB]/10 border border-[#2563EB]/30 border border-indigo-100 px-2.5 py-0.5 rounded-lg">
                                 Browse Image File
                               </span>
                             </div>
@@ -1468,8 +1468,8 @@ export const VisitorManager: React.FC<VisitorManagerProps> = ({
                           </div>
                         )}
                         {scanSuccessMsg && (
-                          <div className="p-3 bg-emerald-50 border border-emerald-100 rounded-xl text-[10.5px] text-emerald-800 flex items-start gap-1.5 shadow-2xs">
-                            <Check className="w-4 h-4 shrink-0 text-emerald-600 font-extrabold" />
+                          <div className="p-3 bg-[#10B981]/10 border border-[#10B981]/30 border border-emerald-100 rounded-xl text-[10.5px] text-[#10B981] flex items-start gap-1.5 shadow-2xs">
+                            <Check className="w-4 h-4 shrink-0 text-[#10B981] font-extrabold" />
                             <span>{scanSuccessMsg}</span>
                           </div>
                         )}
@@ -1477,8 +1477,8 @@ export const VisitorManager: React.FC<VisitorManagerProps> = ({
                     )}
                   </div>
 
-                  <div className="pt-4 border-t border-slate-200/60 flex items-start gap-1.5 text-[9.5px] text-slate-400 mt-4 leading-normal">
-                    <Info className="w-3.5 h-3.5 shrink-0 text-slate-400 mt-0.5" />
+                  <div className="pt-4 border-t border-[#334155]/60 flex items-start gap-1.5 text-[9.5px] text-[#94A3B8] mt-4 leading-normal">
+                    <Info className="w-3.5 h-3.5 shrink-0 text-[#94A3B8] mt-0.5" />
                     <span>Real-time local OCR extracts only factual ID text. No document copies are stored server-side to enforce total privacy compliance rules.</span>
                   </div>
                 </div>
@@ -1488,7 +1488,7 @@ export const VisitorManager: React.FC<VisitorManagerProps> = ({
               <form onSubmit={handleCreateVisitor} className={`p-5 space-y-4 text-xs font-sans text-slate-705 ${isScanPanelOpen ? 'w-full md:w-1/2' : 'w-full'}`}>
               {/* Full name */}
               <div>
-                <label className="block text-xs font-semibold text-slate-500 mb-1">Visitor Full Name *</label>
+                <label className="block text-xs font-semibold text-[#94A3B8] mb-1">Visitor Full Name *</label>
                 <input 
                   type="text"
                   required
@@ -1496,13 +1496,13 @@ export const VisitorManager: React.FC<VisitorManagerProps> = ({
                   value={formName}
                   onChange={(e) => setFormName(e.target.value)}
                   placeholder="e.g. Ramesh Kumar"
-                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-700 font-medium focus:border-indigo-500 focus:bg-white outline-hidden transition-all"
+                  className="w-full bg-[#111827] border border-[#334155] rounded-xl px-3 py-2 text-xs text-[#CBD5E1] font-medium focus:border-indigo-500 focus:bg-[#1E293B] outline-hidden transition-all"
                 />
               </div>
 
               {/* Phone Contacts */}
               <div>
-                <label className="block text-xs font-semibold text-slate-500 mb-1 font-sans">Visitor Mobile Contact Phone *</label>
+                <label className="block text-xs font-semibold text-[#94A3B8] mb-1 font-sans">Visitor Mobile Contact Phone *</label>
                 <input 
                   type="text"
                   required
@@ -1510,18 +1510,18 @@ export const VisitorManager: React.FC<VisitorManagerProps> = ({
                   value={formPhone}
                   onChange={(e) => setFormPhone(e.target.value)}
                   placeholder="+91 98765 43210"
-                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-mono focus:border-indigo-505"
+                  className="w-full bg-[#111827] border border-[#334155] rounded-xl px-3 py-2 text-xs font-mono focus:border-indigo-505"
                 />
               </div>
 
               {/* ID Provided selector */}
               <div>
-                <label className="block text-xs font-semibold text-slate-500 mb-1">Government ID Credentials provided</label>
+                <label className="block text-xs font-semibold text-[#94A3B8] mb-1">Government ID Credentials provided</label>
                 <select
                   id="form-visitor-id-type"
                   value={formIdProvided}
                   onChange={(e) => setFormIdProvided(e.target.value)}
-                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-705"
+                  className="w-full bg-[#111827] border border-[#334155] rounded-xl px-3 py-2 text-xs text-slate-705"
                 >
                   <option value="Aadhaar Card">Aadhaar Card</option>
                   <option value="PAN Card">PAN Card (National Tax ID)</option>
@@ -1533,12 +1533,12 @@ export const VisitorManager: React.FC<VisitorManagerProps> = ({
 
               {/* Target check-in host official */}
               <div>
-                <label className="block text-xs font-semibold text-slate-500 mb-1 font-sans">Meeting Host official *</label>
+                <label className="block text-xs font-semibold text-[#94A3B8] mb-1 font-sans">Meeting Host official *</label>
                 <select
                   id="form-visitor-host"
                   value={formHostId}
                   onChange={(e) => setFormHostId(e.target.value)}
-                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-705"
+                  className="w-full bg-[#111827] border border-[#334155] rounded-xl px-3 py-2 text-xs text-slate-705"
                 >
                   {staffList.map(st => (
                     <option key={st.id} value={st.id}>{st.name} ({st.designation})</option>
@@ -1548,7 +1548,7 @@ export const VisitorManager: React.FC<VisitorManagerProps> = ({
 
               {/* Meeting Reason Purpose */}
               <div>
-                <label className="block text-xs font-semibold text-slate-500 mb-1 font-sans">Meeting Reason Purpose *</label>
+                <label className="block text-xs font-semibold text-[#94A3B8] mb-1 font-sans">Meeting Reason Purpose *</label>
                 <input 
                   type="text"
                   required
@@ -1556,36 +1556,36 @@ export const VisitorManager: React.FC<VisitorManagerProps> = ({
                   value={formPurpose}
                   onChange={(e) => setFormPurpose(e.target.value)}
                   placeholder="e.g. Discuss Student Calculus progress grade"
-                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-705"
+                  className="w-full bg-[#111827] border border-[#334155] rounded-xl px-3 py-2 text-xs text-slate-705"
                 />
               </div>
 
               {/* Descriptive memo notes */}
               <div>
-                <label className="block text-xs font-semibold text-slate-500 mb-1">Logbook Notes</label>
+                <label className="block text-xs font-semibold text-[#94A3B8] mb-1">Logbook Notes</label>
                 <input 
                   type="text"
                   id="form-visitor-notes"
                   value={formNotes}
                   onChange={(e) => setFormNotes(e.target.value)}
                   placeholder="e.g. Signed check-in badge"
-                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-705"
+                  className="w-full bg-[#111827] border border-[#334155] rounded-xl px-3 py-2 text-xs text-slate-705"
                 />
               </div>
 
-              <div className="pt-4 border-t border-slate-100 flex justify-end gap-3">
+              <div className="pt-4 border-t border-[#334155] flex justify-end gap-3">
                 <button
                   type="button"
                   id="btn-cancel-visitor-log"
                   onClick={closeNewVisitorModal}
-                  className="px-4 py-2 border border-slate-200 text-slate-500 rounded-xl text-xs font-semibold cursor-pointer hover:bg-slate-50"
+                  className="px-4 py-2 border border-[#334155] text-[#94A3B8] rounded-xl text-xs font-semibold cursor-pointer hover:bg-[#111827]"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   id="btn-save-visitor-log"
-                  className="px-5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold shadow-xs cursor-pointer"
+                  className="px-5 py-2 bg-[#2563EB] shadow-[0_0_15px_rgba(37,99,235,0.3)] hover:shadow-[0_0_25px_rgba(56,189,248,0.5)] hover:bg-[#38BDF8] hover:bg-indigo-700 text-white rounded-xl text-xs font-bold shadow-lg shadow-black/20 cursor-pointer"
                 >
                   Approve Lobby Access
                 </button>
@@ -1606,16 +1606,16 @@ export const VisitorManager: React.FC<VisitorManagerProps> = ({
             className="pointer-events-auto bg-slate-900 border border-slate-800 text-white rounded-2xl shadow-2xl p-4 flex gap-3.5 items-start justify-between relative overflow-hidden transition-all duration-300 transform translate-y-0 scale-100 font-sans shadow-[0_8px_30px_rgb(0,0,0,0.12)] border-l-4 border-l-indigo-505 animate-slide-in"
           >
             {/* Visual glow indicator */}
-            <div className="w-8 h-8 rounded-full bg-indigo-500/15 border border-indigo-500/30 flex items-center justify-center shrink-0 text-indigo-400 mt-0.5">
+            <div className="w-8 h-8 rounded-full bg-[#2563EB]/10 border border-[#2563EB]/300/15 border border-indigo-500/30 flex items-center justify-center shrink-0 text-indigo-400 mt-0.5">
               <BellRing className="w-4 h-4 text-indigo-400 animate-bounce" />
             </div>
 
             <div className="flex-1 min-w-0 space-y-1">
               <div className="flex items-center gap-1.5">
-                <span className="text-[10px] bg-indigo-500/20 text-indigo-300 font-mono font-bold px-1.5 py-0.5 rounded uppercase tracking-wider">
+                <span className="text-[10px] bg-[#2563EB]/10 border border-[#2563EB]/300/20 text-indigo-300 font-mono font-bold px-1.5 py-0.5 rounded uppercase tracking-wider">
                   Visitor Checked-In
                 </span>
-                <span className="text-[9px] text-slate-400 font-mono">Just Now</span>
+                <span className="text-[9px] text-[#94A3B8] font-mono">Just Now</span>
               </div>
               <h4 className="font-bold text-slate-100 text-xs leading-normal select-all">
                 {toast.visitorName}
@@ -1626,7 +1626,7 @@ export const VisitorManager: React.FC<VisitorManagerProps> = ({
               
               {/* Timing or note details */}
               {toast.message && (
-                <p className="text-[10px] text-slate-400 italic">
+                <p className="text-[10px] text-[#94A3B8] ">
                   "{toast.message}"
                 </p>
               )}
@@ -1635,14 +1635,14 @@ export const VisitorManager: React.FC<VisitorManagerProps> = ({
             <button
               type="button"
               onClick={() => removeToast(toast.id)}
-              className="text-slate-400 hover:text-white hover:bg-slate-800 p-1 rounded-lg transition-all cursor-pointer shadow-3xs hover:scale-105 active:scale-95"
+              className="text-[#94A3B8] hover:text-white hover:bg-slate-800 p-1 rounded-lg transition-all cursor-pointer shadow-3xs hover:scale-105 active:scale-95"
               title="Close notification"
             >
               <X className="w-3.5 h-3.5" />
             </button>
 
             {/* Self-destruction time progress visual indicator line */}
-            <div className="absolute bottom-0 left-0 h-1 bg-indigo-500 animate-toast-progress"></div>
+            <div className="absolute bottom-0 left-0 h-1 bg-[#2563EB]/10 border border-[#2563EB]/300 animate-toast-progress"></div>
           </div>
         ))}
       </div>
@@ -1650,7 +1650,7 @@ export const VisitorManager: React.FC<VisitorManagerProps> = ({
       {/* DIGITAL VISITOR ENTRY PASS MODAL (WITH QR CODE) */}
       {selectedPassVisitor && (
         <div className="fixed inset-0 z-60 bg-slate-950/40 backdrop-blur-xs flex items-center justify-center p-4 animate-fade-in" id="visitor-gatepass-modal">
-          <div className="bg-white rounded-3xl w-full max-w-sm shadow-2xl border border-slate-100 flex flex-col overflow-hidden max-h-[90vh]">
+          <div className="bg-[#1E293B] rounded-3xl w-full max-w-sm shadow-2xl border border-[#334155] flex flex-col overflow-hidden max-h-[90vh]">
             
             {/* Visual Header Panel with CBSE Style Ribbon */}
             <div className="bg-indigo-900 px-6 py-4 text-white text-center relative">
@@ -1661,37 +1661,37 @@ export const VisitorManager: React.FC<VisitorManagerProps> = ({
               <button
                 type="button"
                 onClick={() => setSelectedPassVisitor(null)}
-                className="absolute right-4 top-4 hover:bg-white/10 p-1 rounded-full text-indigo-200 hover:text-white transition-all cursor-pointer"
+                className="absolute right-4 top-4 hover:bg-[#1E293B]/10 p-1 rounded-full text-indigo-200 hover:text-white transition-all cursor-pointer"
               >
                 <X className="w-4 h-4" />
               </button>
             </div>
 
             {/* Main Gate Pass Body Card */}
-            <div className="p-6 flex-grow overflow-y-auto space-y-4 text-slate-800 text-left" id="print-pass-area">
+            <div className="p-6 flex-grow overflow-y-auto space-y-4 text-white text-left" id="print-pass-area">
               
               {/* Status Indicator Stamp Header */}
-              <div className="flex justify-between items-start border-b border-dashed border-slate-200 pb-3">
+              <div className="flex justify-between items-start border-b border-dashed border-[#334155] pb-3">
                 <div>
-                  <h4 className="font-extrabold text-slate-900 text-xs uppercase tracking-wide">CAMPUS GATE PERMIT</h4>
-                  <p className="text-[9px] text-slate-400 font-sans tracking-wide mt-0.5">Dwarka Institutional Campus, ND</p>
+                  <h4 className="font-extrabold text-white text-xs uppercase tracking-wide">CAMPUS GATE PERMIT</h4>
+                  <p className="text-[9px] text-[#94A3B8] font-sans tracking-wide mt-0.5">Dwarka Institutional Campus, ND</p>
                 </div>
                 <div>
                   {selectedPassVisitor.checkOut ? (
-                    <span className="bg-slate-100 text-slate-500 border border-slate-200 text-[8.5px] font-black px-2 py-0.5 rounded uppercase tracking-wider">
+                    <span className="bg-[#273549] text-[#94A3B8] border border-[#334155] text-[8.5px] font-black px-2 py-0.5 rounded uppercase tracking-wider">
                       Checked-Out Exit
                     </span>
                   ) : (
-                    <span className="bg-emerald-50 text-emerald-800 border border-emerald-250 text-[8.5px] font-black px-2 py-0.5 rounded uppercase tracking-wider animate-pulse flex items-center gap-0.5">
-                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block"></span> Gate: Active Inside
+                    <span className="bg-[#10B981]/10 border border-[#10B981]/30 text-[#10B981] border border-emerald-250 text-[8.5px] font-black px-2 py-0.5 rounded uppercase tracking-wider animate-pulse flex items-center gap-0.5">
+                      <span className="w-1.5 h-1.5 rounded-full bg-[#10B981]/10 border border-[#10B981]/300 inline-block"></span> Gate: Active Inside
                     </span>
                   )}
                 </div>
               </div>
 
               {/* High Quality SCANNABLE QR CODE Frame */}
-              <div className="flex flex-col items-center justify-center space-y-2 bg-slate-50 p-4 rounded-2xl border border-slate-150">
-                <div className="bg-white p-2.5 rounded-xl shadow-xs border border-slate-200 flex items-center justify-center">
+              <div className="flex flex-col items-center justify-center space-y-2 bg-[#111827] p-4 rounded-2xl border border-[#334155]">
+                <div className="bg-[#1E293B] p-2.5 rounded-xl shadow-lg shadow-black/20 border border-[#334155] flex items-center justify-center">
                   <img 
                     src={`https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(
                       `${window.location.origin}${window.location.pathname}?checkoutVisitorId=${selectedPassVisitor.id}`
@@ -1702,47 +1702,47 @@ export const VisitorManager: React.FC<VisitorManagerProps> = ({
                   />
                 </div>
                 <div className="text-center font-mono font-bold">
-                  <p className="text-[9px] text-slate-400 tracking-widest uppercase">Pass Reference Code</p>
+                  <p className="text-[9px] text-[#94A3B8] tracking-widest uppercase">Pass Reference Code</p>
                   <h5 className="text-xs font-black text-indigo-800 tracking-wider mt-0.5 uppercase">{selectedPassVisitor.id}</h5>
                 </div>
               </div>
 
               {/* Visitor Profile Grid parameters */}
-              <div className="grid grid-cols-2 gap-x-3 gap-y-2.5 bg-slate-50/50 p-3 rounded-xl text-left border border-slate-100 text-[10.5px]">
+              <div className="grid grid-cols-2 gap-x-3 gap-y-2.5 bg-[#111827] p-3 rounded-xl text-left border border-[#334155] text-[10.5px]">
                 <div>
-                  <p className="text-[8.5px] text-slate-400 uppercase tracking-wider font-semibold">Visitor Name</p>
-                  <p className="font-bold text-slate-800 truncate">{selectedPassVisitor.name}</p>
+                  <p className="text-[8.5px] text-[#94A3B8] uppercase tracking-wider font-semibold">Visitor Name</p>
+                  <p className="font-bold text-white truncate">{selectedPassVisitor.name}</p>
                 </div>
                 <div>
-                  <p className="text-[8.5px] text-slate-400 uppercase tracking-wider font-semibold">Contact Mobile</p>
-                  <p className="font-mono text-slate-700">{selectedPassVisitor.phone}</p>
+                  <p className="text-[8.5px] text-[#94A3B8] uppercase tracking-wider font-semibold">Contact Mobile</p>
+                  <p className="font-mono text-[#CBD5E1]">{selectedPassVisitor.phone}</p>
                 </div>
-                <div className="col-span-2 border-t border-slate-100/30 pt-1.5">
-                  <p className="text-[8.5px] text-slate-400 uppercase tracking-wider font-semibold">Target Official</p>
-                  <p className="font-bold text-slate-800 truncate">
+                <div className="col-span-2 border-t border-[#334155]/30 pt-1.5">
+                  <p className="text-[8.5px] text-[#94A3B8] uppercase tracking-wider font-semibold">Target Official</p>
+                  <p className="font-bold text-white truncate">
                     {selectedPassVisitor.hostName} <span className="text-[9.5px] text-slate-450 font-normal">({selectedPassVisitor.hostRole})</span>
                   </p>
                 </div>
-                <div className="col-span-2 border-t border-slate-100/30 pt-1.5">
-                  <p className="text-[8.5px] text-slate-400 uppercase tracking-wider font-semibold">Access Purpose</p>
-                  <p className="font-medium text-slate-700 truncate">{selectedPassVisitor.purpose}</p>
+                <div className="col-span-2 border-t border-[#334155]/30 pt-1.5">
+                  <p className="text-[8.5px] text-[#94A3B8] uppercase tracking-wider font-semibold">Access Purpose</p>
+                  <p className="font-medium text-[#CBD5E1] truncate">{selectedPassVisitor.purpose}</p>
                 </div>
-                <div className="border-t border-slate-100/30 pt-1.5">
-                  <p className="text-[8.5px] text-slate-400 uppercase tracking-wider font-semibold">Campus Check-In</p>
-                  <p className="font-mono text-slate-600 text-[9.5px]">{selectedPassVisitor.checkIn}</p>
+                <div className="border-t border-[#334155]/30 pt-1.5">
+                  <p className="text-[8.5px] text-[#94A3B8] uppercase tracking-wider font-semibold">Campus Check-In</p>
+                  <p className="font-mono text-[#CBD5E1] text-[9.5px]">{selectedPassVisitor.checkIn}</p>
                 </div>
-                <div className="border-t border-slate-100/30 pt-1.5">
-                  <p className="text-[8.5px] text-slate-400 uppercase tracking-wider font-semibold">Campus Check-Out</p>
-                  <p className="font-mono text-[9.5px] text-rose-600 font-bold">
+                <div className="border-t border-[#334155]/30 pt-1.5">
+                  <p className="text-[8.5px] text-[#94A3B8] uppercase tracking-wider font-semibold">Campus Check-Out</p>
+                  <p className="font-mono text-[9.5px] text-[#EF4444] font-bold">
                     {selectedPassVisitor.checkOut ? selectedPassVisitor.checkOut : 'Authorized Entry'}
                   </p>
                 </div>
               </div>
 
               {/* Signature and instruction */}
-              <div className="text-[9.5px] text-slate-450 text-center space-y-1.5 bg-slate-50/20 p-2.5 rounded-lg border border-slate-100/50">
+              <div className="text-[9.5px] text-slate-450 text-center space-y-1.5 bg-[#111827]/20 p-2.5 rounded-lg border border-[#334155]/50">
                 <p>Scan this pass above with any smartphone camera instantly at exit gates to perform touchless digital check-out.</p>
-                <div className="w-1/3 border-t border-dashed border-slate-200 mx-auto pt-1 text-[9.5px] font-sans font-semibold text-slate-500 uppercase tracking-wide">
+                <div className="w-1/3 border-t border-dashed border-[#334155] mx-auto pt-1 text-[9.5px] font-sans font-semibold text-[#94A3B8] uppercase tracking-wide">
                   Gate Security Log
                 </div>
               </div>
@@ -1750,13 +1750,13 @@ export const VisitorManager: React.FC<VisitorManagerProps> = ({
             </div>
 
             {/* Action button bar */}
-            <div className="p-4 bg-slate-50 border-t border-slate-100 flex gap-2">
+            <div className="p-4 bg-[#111827] border-t border-[#334155] flex gap-2">
               <button
                 type="button"
                 onClick={() => {
                   window.print();
                 }}
-                className="flex-grow flex items-center justify-center gap-1 px-3.5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl text-xs transition-all cursor-pointer border border-slate-200"
+                className="flex-grow flex items-center justify-center gap-1 px-3.5 py-2.5 bg-[#273549] hover:bg-[#334155] text-[#CBD5E1] font-bold rounded-xl text-xs transition-all cursor-pointer border border-[#334155]"
               >
                 <Printer className="w-4 h-4" />
                 Print Pass
@@ -1786,8 +1786,8 @@ export const VisitorManager: React.FC<VisitorManagerProps> = ({
                 }}
                 className={`flex-grow flex items-center justify-center gap-1.5 px-3.5 py-2.5 text-white font-bold rounded-xl text-xs transition-all cursor-pointer ${
                   selectedPassVisitor.checkOut
-                    ? 'bg-slate-300 border-slate-300 text-slate-500 cursor-not-allowed'
-                    : 'bg-emerald-600 hover:bg-emerald-700 shadow-sm animate-pulse'
+                    ? 'bg-slate-300 border-slate-300 text-[#94A3B8] cursor-not-allowed'
+                    : 'bg-emerald-600 hover:bg-emerald-700 shadow-xl shadow-black/40 animate-pulse'
                 }`}
                 disabled={!!selectedPassVisitor.checkOut}
               >

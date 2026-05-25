@@ -1,30 +1,19 @@
-@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700;800;900&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Montserrat:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
 @import "tailwindcss";
 
 @theme {
-  --font-sans: 'Cormorant Garamond', Georgia, serif;
-  --font-display: 'Cinzel', 'Playfair Display', serif;
+  --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif;
+  --font-display: 'Inter', ui-sans-serif, system-ui, sans-serif;
   --font-mono: 'JetBrains Mono', monospace;
 
-  /* Royal & Classy gold brand color override mapping indigo */
-  --color-indigo-50: #faf6eb;   /* Pearl Alabaster / Champagne Cream */
-  --color-indigo-100: #f5eedc;  /* Soft Warm Champagne */
-  --color-indigo-200: #ead2a3;  /* Antique Gold Base */
-  --color-indigo-300: #dfbf85;  /* Noblesse Pale Gold */
-  --color-indigo-400: #cca561;  /* Brushed Gold Accent */
-  --color-indigo-500: #b98d45;  /* Royal Emblem Gold */
-  --color-indigo-600: #9e7534;  /* Classic Imperial Royal Gold */
-  --color-indigo-700: #815e26;  /* Deep Dynasty Bronze */
-  --color-indigo-800: #62461a;  /* Court Room Bronze */
-  --color-indigo-900: #433010;  /* Crown Royal Gold Dusk */
-  --color-indigo-950: #291c06;  /* Gold Shadow Dust */
+  /* Custom SaaS Palette override */
 }
 
 body {
   font-family: var(--font-sans);
-  background-color: #f7f5ef; /* Royal Alabaster Warm Linen */
-  color: #1a1a1f;
-  letter-spacing: 0.02em;
+  background-color: #0B1120;
+  color: #FFFFFF;
+  letter-spacing: 0.01em;
 }
 
 h1, .font-display {
@@ -33,7 +22,7 @@ h1, .font-display {
 
 h2, h3, h4, h5, h6 {
   font-family: var(--font-display);
-  letter-spacing: 0.04em;
+  letter-spacing: 0.02em;
 }
 
 /* Custom micro transitions and focus states */
@@ -52,35 +41,16 @@ h2, h3, h4, h5, h6 {
   }
 }
 
-/* Imperial decorative components */
-.royal-border {
-  border-image: linear-gradient(to right, #b98d45, #dfbf85, #b98d45) 1;
-}
-
-.champagne-gradient {
-  background: linear-gradient(135deg, #faf6eb 0%, #f5eedc 100%);
-}
-
-.royal-gradient {
-  background: linear-gradient(135deg, #0d1b3e 0%, #050b1d 100%);
-}
-
-.gold-gradient {
-  background: linear-gradient(135deg, #dfbf85 0%, #b98d45 100%);
-}
-
-.glow-gold {
-  box-shadow: 0 4px 25px -2px rgba(185, 141, 69, 0.3);
-}
-
-.glow-royal {
-  box-shadow: 0 10px 30px -5px rgba(13, 27, 62, 0.4);
+/* Modern SaaS components */
+.glow-gold, .glow-royal {
+  box-shadow: 0 4px 25px -2px rgba(56, 189, 248, 0.15); /* Soft accent glow */
+  border: 1px solid #334155; 
 }
 
 /* Custom scrollbars for data tables and side menus */
 ::-webkit-scrollbar {
-  width: 5px;
-  height: 5px;
+  width: 6px;
+  height: 6px;
 }
 
 ::-webkit-scrollbar-track {
@@ -88,12 +58,12 @@ h2, h3, h4, h5, h6 {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #ead2a3;
+  background: #334155;
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #b98d45;
+  background: #2563EB;
 }
 
 /* Toast entrance and duration dynamic animations */

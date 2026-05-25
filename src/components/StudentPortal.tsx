@@ -44,7 +44,7 @@ export const StudentPortal: React.FC<StudentPortalProps> = ({ students, attendan
   const [uploadedName, setUploadedName] = useState('');
 
   if (!currentStudent) {
-    return <div className="text-center font-bold text-slate-500 py-10">No students found.</div>;
+    return <div className="text-center font-bold text-[#94A3B8] py-10">No students found.</div>;
   }
 
   // Calculate stats for selected student
@@ -92,16 +92,16 @@ export const StudentPortal: React.FC<StudentPortalProps> = ({ students, attendan
       {/* Dynamic Persona Swapper Bar */}
       <div className="bg-gradient-to-r from-blue-50 to-indigo-50 p-4 rounded-2xl border border-indigo-100 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h2 className="text-xs font-black uppercase tracking-widest text-indigo-900 font-mono">Student Portal Simulator</h2>
-          <p className="text-[11px] text-slate-500 mt-0.5">Toggle student logins to audit profiles, roll records, and vaults.</p>
+          <h2 className="text-xs font-black uppercase tracking-widest text-white font-mono">Student Portal Simulator</h2>
+          <p className="text-[11px] text-[#94A3B8] mt-0.5">Toggle student logins to audit profiles, roll records, and vaults.</p>
         </div>
         <div className="flex items-center gap-2">
-          <span className="text-[11px] font-bold text-slate-500">Active Student Account:</span>
+          <span className="text-[11px] font-bold text-[#94A3B8]">Active Student Account:</span>
           <select 
             id="student-persona-select"
             value={activeStudentId}
             onChange={(e) => setActiveStudentId(e.target.value)}
-            className="bg-white border text-xs font-bold border-slate-200 rounded-xl px-3 py-1.5 focus:border-indigo-500 focus:bg-white outline-hidden text-slate-700 cursor-pointer"
+            className="bg-[#1E293B] border text-xs font-bold border-[#334155] rounded-xl px-3 py-1.5 focus:border-indigo-500 focus:bg-[#1E293B] outline-hidden text-[#CBD5E1] cursor-pointer"
           >
             {students.map(s => (
               <option key={s.id} value={s.id}>{s.name} ({s.id})</option>
@@ -117,46 +117,46 @@ export const StudentPortal: React.FC<StudentPortalProps> = ({ students, attendan
         <div className="lg:col-span-4 space-y-6">
           
           {/* Main ID Certificate Card */}
-          <div className="bg-white rounded-3xl border border-slate-100 shadow-3xs overflow-hidden relative">
-            <div className="h-2 bg-indigo-600"></div>
+          <div className="bg-[#1E293B] rounded-3xl border border-[#334155] shadow-3xs overflow-hidden relative">
+            <div className="h-2 bg-[#2563EB] shadow-[0_0_15px_rgba(37,99,235,0.3)] hover:shadow-[0_0_25px_rgba(56,189,248,0.5)] hover:bg-[#38BDF8]"></div>
             <div className="p-6 text-center space-y-4">
               
-              <div className="mx-auto w-20 h-20 bg-indigo-50 rounded-full flex items-center justify-center text-indigo-700 text-2xl font-black border-2 border-indigo-100">
+              <div className="mx-auto w-20 h-20 bg-[#2563EB]/10 border border-[#2563EB]/30 rounded-full flex items-center justify-center text-[#38BDF8] text-2xl font-black border-2 border-indigo-100">
                 {currentStudent.name.split(' ').map(n=>n[0]).join('')}
               </div>
 
               <div>
-                <h3 className="text-base font-bold text-slate-900">{currentStudent.name}</h3>
-                <p className="text-[11px] text-slate-400 font-bold font-mono tracking-wider mt-0.5">{currentStudent.className} • Section {currentStudent.section}</p>
-                <span className="mt-2 inline-block bg-emerald-50 text-emerald-800 border border-emerald-100 text-[10px] font-black font-sans px-2.5 py-0.5 rounded-full uppercase">
+                <h3 className="text-base font-bold text-white">{currentStudent.name}</h3>
+                <p className="text-[11px] text-[#94A3B8] font-bold font-mono tracking-wider mt-0.5">{currentStudent.className} • Section {currentStudent.section}</p>
+                <span className="mt-2 inline-block bg-[#10B981]/10 border border-[#10B981]/30 text-[#10B981] border border-emerald-100 text-[10px] font-black font-sans px-2.5 py-0.5 rounded-full uppercase">
                   Active Enrolled
                 </span>
               </div>
 
               {/* ID & Roll specs */}
               <div className="grid grid-cols-2 gap-2 pt-4 border-t border-slate-50 text-left text-[11px]">
-                <div className="bg-slate-50 p-2.5 rounded-xl border border-slate-100">
-                  <span className="text-[9px] text-slate-400 uppercase font-bold block">Roll Number</span>
-                  <span className="font-mono font-bold text-slate-800">{currentStudent.rollNo.toString().padStart(2, '0')}</span>
+                <div className="bg-[#111827] p-2.5 rounded-xl border border-[#334155]">
+                  <span className="text-[9px] text-[#94A3B8] uppercase font-bold block">Roll Number</span>
+                  <span className="font-mono font-bold text-white">{currentStudent.rollNo.toString().padStart(2, '0')}</span>
                 </div>
-                <div className="bg-slate-50 p-2.5 rounded-xl border border-slate-100">
-                  <span className="text-[9px] text-slate-400 uppercase font-bold block">Admission ID</span>
-                  <span className="font-mono font-bold text-slate-850 truncate">{currentStudent.admissionNo}</span>
+                <div className="bg-[#111827] p-2.5 rounded-xl border border-[#334155]">
+                  <span className="text-[9px] text-[#94A3B8] uppercase font-bold block">Admission ID</span>
+                  <span className="font-mono font-bold text-white truncate">{currentStudent.admissionNo}</span>
                 </div>
-                <div className="bg-slate-50 p-2.5 rounded-xl border border-slate-100 col-span-2">
-                  <span className="text-[9px] text-slate-400 uppercase font-bold block">Registrar Parent</span>
+                <div className="bg-[#111827] p-2.5 rounded-xl border border-[#334155] col-span-2">
+                  <span className="text-[9px] text-[#94A3B8] uppercase font-bold block">Registrar Parent</span>
                   <span className="font-sans font-semibold text-slate-750">{currentStudent.parentsName}</span>
                 </div>
               </div>
 
               {/* Personal Hub Specs */}
-              <div className="space-y-2.5 text-left text-[11px] text-slate-500 pt-2 font-medium">
+              <div className="space-y-2.5 text-left text-[11px] text-[#94A3B8] pt-2 font-medium">
                 <div className="flex items-center gap-2">
-                  <Calendar className="w-4 h-4 text-slate-400 shrink-0" />
-                  <span>DOB: <strong className="text-slate-700 font-mono">{currentStudent.dob}</strong></span>
+                  <Calendar className="w-4 h-4 text-[#94A3B8] shrink-0" />
+                  <span>DOB: <strong className="text-[#CBD5E1] font-mono">{currentStudent.dob}</strong></span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <MapPin className="w-4 h-4 text-slate-400 shrink-0" />
+                  <MapPin className="w-4 h-4 text-[#94A3B8] shrink-0" />
                   <span>Campus Landmass: Dwarka, New Delhi</span>
                 </div>
                 <div className="flex items-center gap-2">
@@ -169,16 +169,16 @@ export const StudentPortal: React.FC<StudentPortalProps> = ({ students, attendan
           </div>
 
           {/* Core Roll Number Tracking & Attendance KPI Frame */}
-          <div className="bg-white p-5 rounded-3xl border border-slate-100 shadow-3xs space-y-4">
-            <h4 className="text-xs font-bold text-slate-400 uppercase tracking-wider">Attendance & Tracking Streak</h4>
+          <div className="bg-[#1E293B] p-5 rounded-3xl border border-[#334155] shadow-3xs space-y-4">
+            <h4 className="text-xs font-bold text-[#94A3B8] uppercase tracking-wider">Attendance & Tracking Streak</h4>
             <div className="flex items-center justify-between">
               <div>
-                <span className="text-2xl font-black text-slate-800 font-mono">{attRate}%</span>
-                <p className="text-[10px] text-slate-400 mt-0.5">Academic Attendance</p>
+                <span className="text-2xl font-black text-white font-mono">{attRate}%</span>
+                <p className="text-[10px] text-[#94A3B8] mt-0.5">Academic Attendance</p>
               </div>
               <div className="text-right">
-                <span className="inline-flex items-center gap-1 bg-emerald-50 text-emerald-700 text-[10px] font-bold px-2 py-0.5 rounded-md border border-emerald-150">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span> Excellent
+                <span className="inline-flex items-center gap-1 bg-[#10B981]/10 border border-[#10B981]/30 text-[#10B981] text-[10px] font-bold px-2 py-0.5 rounded-md border border-emerald-150">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#10B981]/10 border border-[#10B981]/300 animate-pulse"></span> Excellent
                 </span>
                 <p className="text-[10.5px] text-slate-450 mt-1 font-mono">Streak: 12 Days</p>
               </div>
@@ -186,10 +186,10 @@ export const StudentPortal: React.FC<StudentPortalProps> = ({ students, attendan
             {/* Visual streak blocks */}
             <div className="grid grid-cols-12 gap-1 pt-2">
               {[...Array(12)].map((_, i) => (
-                <div key={i} className={`h-3 rounded-md ${i < 11 ? 'bg-emerald-500' : 'bg-amber-400'} border border-white`} title={i < 11 ? 'Present' : 'Late/Leave'}></div>
+                <div key={i} className={`h-3 rounded-md ${i < 11 ? 'bg-[#10B981]/10 border border-[#10B981]/300' : 'bg-amber-500'} border border-white`} title={i < 11 ? 'Present' : 'Late/Leave'}></div>
               ))}
             </div>
-            <p className="text-[9.5px] text-slate-400 text-left font-serif">Daily RFID attendance ticks auto-broadcast alerts back home securely.</p>
+            <p className="text-[9.5px] text-[#94A3B8] text-left font-serif">Daily RFID attendance ticks auto-broadcast alerts back home securely.</p>
           </div>
 
         </div>
@@ -198,11 +198,11 @@ export const StudentPortal: React.FC<StudentPortalProps> = ({ students, attendan
         <div className="lg:col-span-8 space-y-6 text-left">
           
           {/* Part A: Vault */}
-          <div className="bg-white p-6 rounded-3xl border border-slate-100 shadow-3xs space-y-5">
+          <div className="bg-[#1E293B] p-6 rounded-3xl border border-[#334155] shadow-3xs space-y-5">
             <div className="flex justify-between items-center border-b border-slate-50 pb-3">
               <div>
-                <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest font-mono">My Digital Document Vault</h3>
-                <p className="text-xs text-slate-500 mt-0.5">Encrypted student dossier backups (Aadhaar copy, Transfer Certificate TC).</p>
+                <h3 className="text-xs font-bold text-[#94A3B8] uppercase tracking-widest font-mono">My Digital Document Vault</h3>
+                <p className="text-xs text-[#94A3B8] mt-0.5">Encrypted student dossier backups (Aadhaar copy, Transfer Certificate TC).</p>
               </div>
               <div className="relative">
                 <input 
@@ -214,7 +214,7 @@ export const StudentPortal: React.FC<StudentPortalProps> = ({ students, attendan
                 />
                 <label 
                   htmlFor="vault-file-uploader"
-                  className={`flex items-center gap-1.5 px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl text-xs cursor-pointer transition-all ${isUploading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                  className={`flex items-center gap-1.5 px-3 py-1.5 bg-[#2563EB] shadow-[0_0_15px_rgba(37,99,235,0.3)] hover:shadow-[0_0_25px_rgba(56,189,248,0.5)] hover:bg-[#38BDF8] hover:bg-indigo-700 text-white font-bold rounded-xl text-xs cursor-pointer transition-all ${isUploading ? 'opacity-50 cursor-not-allowed' : ''}`}
                 >
                   <Upload className="w-3.5 h-3.5" />
                   <span>{isUploading ? 'Uploading...' : 'Back Up Copy'}</span>
@@ -225,20 +225,20 @@ export const StudentPortal: React.FC<StudentPortalProps> = ({ students, attendan
             {/* Document Ledger List */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {vaultDocs.map(doc => (
-                <div key={doc.id} className="p-3.5 bg-slate-50 hover:bg-slate-100/70 rounded-2xl border border-slate-150 flex items-center justify-between transition-all" id={`vault-doc-${doc.id}`}>
+                <div key={doc.id} className="p-3.5 bg-[#111827] hover:bg-[#273549]/70 rounded-2xl border border-[#334155] flex items-center justify-between transition-all" id={`vault-doc-${doc.id}`}>
                   <div className="flex items-center gap-3">
-                    <div className="p-2 bg-white rounded-xl text-indigo-700 border border-slate-150 shrink-0">
+                    <div className="p-2 bg-[#1E293B] rounded-xl text-[#38BDF8] border border-[#334155] shrink-0">
                       <FileText className="w-4.5 h-4.5" />
                     </div>
                     <div className="min-w-0">
-                      <h4 className="text-xs font-bold text-slate-800 truncate" title={doc.name}>{doc.name}</h4>
-                      <p className="text-[10px] text-indigo-600 font-mono tracking-wider mt-0.5">{doc.ref}</p>
+                      <h4 className="text-xs font-bold text-white truncate" title={doc.name}>{doc.name}</h4>
+                      <p className="text-[10px] text-[#2563EB] font-mono tracking-wider mt-0.5">{doc.ref}</p>
                     </div>
                   </div>
                   <button 
                     type="button"
                     onClick={() => alert(`Offline download initialized for digital token: ${doc.ref}`)}
-                    className="p-1.5 hover:bg-indigo-50 rounded-lg text-slate-400 hover:text-indigo-600 cursor-pointer transition-all"
+                    className="p-1.5 hover:bg-[#2563EB]/10 border border-[#2563EB]/30 rounded-lg text-[#94A3B8] hover:text-[#38BDF8] hover:drop-shadow-[0_0_8px_rgba(56,189,248,0.5)] cursor-pointer transition-all"
                     title="Download decrypted proof copy"
                   >
                     <Download className="w-4 h-4" />
@@ -247,28 +247,28 @@ export const StudentPortal: React.FC<StudentPortalProps> = ({ students, attendan
               ))}
             </div>
             
-            <div className="flex items-center gap-2 bg-emerald-50/50 p-2.5 rounded-xl border border-emerald-100/40 text-[10.5px] text-emerald-800">
-              <ShieldCheck className="w-4 h-4 text-emerald-600 shrink-0" />
+            <div className="flex items-center gap-2 bg-[#10B981]/10 border border-[#10B981]/30/50 p-2.5 rounded-xl border border-emerald-100/40 text-[10.5px] text-[#10B981]">
+              <ShieldCheck className="w-4 h-4 text-[#10B981] shrink-0" />
               <span>DigiLocker Certified: CBSE legal backing permits online verification without paper TC submission.</span>
             </div>
           </div>
 
           {/* Part B: Student Diary */}
-          <div className="bg-white p-6 rounded-3xl border border-slate-100 shadow-3xs space-y-4">
+          <div className="bg-[#1E293B] p-6 rounded-3xl border border-[#334155] shadow-3xs space-y-4">
             <div>
-              <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest font-mono">My Daily Homework Diary</h3>
-              <p className="text-xs text-slate-500 mt-0.5">Maintain study objectives, prep exam milestones & log self-study logs daily.</p>
+              <h3 className="text-xs font-bold text-[#94A3B8] uppercase tracking-widest font-mono">My Daily Homework Diary</h3>
+              <p className="text-xs text-[#94A3B8] mt-0.5">Maintain study objectives, prep exam milestones & log self-study logs daily.</p>
             </div>
 
             {/* Diary Log Input */}
-            <form onSubmit={handleCreateDiaryEntry} className="bg-slate-50/50 p-4 rounded-2xl border border-slate-100 space-y-3">
+            <form onSubmit={handleCreateDiaryEntry} className="bg-[#111827] p-4 rounded-2xl border border-[#334155] space-y-3">
               <div className="flex flex-col sm:flex-row gap-3">
                 <div className="w-full sm:w-1/3">
-                  <label className="block text-[10px] font-bold text-slate-400 mb-1 font-mono uppercase">Subject Specialty</label>
+                  <label className="block text-[10px] font-bold text-[#94A3B8] mb-1 font-mono uppercase">Subject Specialty</label>
                   <select
                     value={newDiarySubject}
                     onChange={(e) => setNewDiarySubject(e.target.value)}
-                    className="w-full bg-white border border-slate-200 text-xs font-semibold rounded-xl px-2.5 py-1.5 outline-hidden"
+                    className="w-full bg-[#1E293B] border border-[#334155] text-xs font-semibold rounded-xl px-2.5 py-1.5 outline-hidden"
                   >
                     <option value="Mathematics">Mathematics</option>
                     <option value="Physics">Physics</option>
@@ -278,7 +278,7 @@ export const StudentPortal: React.FC<StudentPortalProps> = ({ students, attendan
                   </select>
                 </div>
                 <div className="flex-grow">
-                  <label className="block text-[10px] font-bold text-slate-400 mb-1 font-mono uppercase">Entry Content / Diary task</label>
+                  <label className="block text-[10px] font-bold text-[#94A3B8] mb-1 font-mono uppercase">Entry Content / Diary task</label>
                   <div className="flex gap-2">
                     <input 
                       type="text"
@@ -286,11 +286,11 @@ export const StudentPortal: React.FC<StudentPortalProps> = ({ students, attendan
                       value={newDiaryContent}
                       onChange={(e) => setNewDiaryContent(e.target.value)}
                       placeholder="e.g. Completed Chapter 5 Exercise 2 in Chemistry notebook."
-                      className="flex-grow bg-white border border-slate-200 text-xs font-medium rounded-xl px-3 py-1.5 outline-hidden focus:border-indigo-500"
+                      className="flex-grow bg-[#1E293B] border border-[#334155] text-xs font-medium rounded-xl px-3 py-1.5 outline-hidden focus:border-indigo-500"
                     />
                     <button
                       type="submit"
-                      className="px-4 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl text-xs cursor-pointer transition-all flex items-center gap-1 shrink-0"
+                      className="px-4 py-1.5 bg-[#2563EB] shadow-[0_0_15px_rgba(37,99,235,0.3)] hover:shadow-[0_0_25px_rgba(56,189,248,0.5)] hover:bg-[#38BDF8] hover:bg-indigo-700 text-white font-bold rounded-xl text-xs cursor-pointer transition-all flex items-center gap-1 shrink-0"
                     >
                       <Plus className="w-3.5 h-3.5" />
                       <span>Log</span>
@@ -303,15 +303,15 @@ export const StudentPortal: React.FC<StudentPortalProps> = ({ students, attendan
             {/* Diary notes list dynamic output */}
             <div className="space-y-3 pt-2">
               {diaryNotes.map(note => (
-                <div key={note.id} className="p-3.5 rounded-2xl border border-slate-100 bg-white shadow-3xs flex justify-between gap-4 items-start hover:border-indigo-50 transition-colors">
+                <div key={note.id} className="p-3.5 rounded-2xl border border-[#334155] bg-[#1E293B] shadow-3xs flex justify-between gap-4 items-start hover:border-indigo-50 transition-colors">
                   <div className="space-y-1 max-w-[80%]">
                     <div className="flex items-center gap-2">
-                      <span className="text-[10.5px] font-black text-indigo-700 uppercase bg-indigo-50/50 px-2 py-0.5 rounded-md">
+                      <span className="text-[10.5px] font-black text-[#38BDF8] uppercase bg-[#2563EB]/10 border border-[#2563EB]/30/50 px-2 py-0.5 rounded-md">
                         {note.subject}
                       </span>
-                      <span className="text-[10px] text-slate-400 font-mono">{note.date}</span>
+                      <span className="text-[10px] text-[#94A3B8] font-mono">{note.date}</span>
                     </div>
-                    <p className="text-xs text-slate-700 leading-relaxed font-sans">{note.content}</p>
+                    <p className="text-xs text-[#CBD5E1] leading-relaxed font-sans">{note.content}</p>
                   </div>
                   <div>
                     <button
@@ -321,11 +321,11 @@ export const StudentPortal: React.FC<StudentPortalProps> = ({ students, attendan
                       }}
                       className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[10px] font-bold transition-all border cursor-pointer ${
                         note.status === 'Completed'
-                          ? 'bg-emerald-50 text-emerald-800 border-emerald-150'
-                          : 'bg-slate-55 hover:bg-slate-100 text-slate-500 border-slate-200'
+                          ? 'bg-[#10B981]/10 border border-[#10B981]/30 text-[#10B981] border-emerald-150'
+                          : 'bg-slate-55 hover:bg-[#273549] text-[#94A3B8] border-[#334155]'
                       }`}
                     >
-                      <CheckCircle className={`w-3.5 h-3.5 ${note.status === 'Completed' ? 'text-emerald-600' : 'text-slate-450'}`} />
+                      <CheckCircle className={`w-3.5 h-3.5 ${note.status === 'Completed' ? 'text-[#10B981]' : 'text-slate-450'}`} />
                       <span>{note.status}</span>
                     </button>
                   </div>
